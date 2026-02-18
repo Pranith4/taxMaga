@@ -302,6 +302,9 @@ function doPost(e){
 <div class="su"><div class="uav" id="sav">R</div><div class="ui"><div class="uname" id="snam">User</div><div class="upan" id="span2">PAN: ----</div></div></div>
 <div class="snav">
 <div class="snl">Overview</div><div class="ni active" onclick="showP('dashboard')"><span class="ico">&#127968;</span> Dashboard</div>
+<div class="snl">Smart Tools</div>
+<div class="ni" onclick="showP('advisor')"><span class="ico">&#127775;</span> AI Tax Advisor</div>
+<div class="ni" onclick="showP('investments')"><span class="ico">&#128200;</span> Investment Planner</div>
 <div class="snl">Tax Tools</div>
 <div class="ni" onclick="showP('calculator')"><span class="ico">&#129518;</span> Tax Calculator</div>
 <div class="ni" onclick="showP('deductions')"><span class="ico">&#128176;</span> Deductions &amp; Savings</div>
@@ -328,13 +331,19 @@ function doPost(e){
 <div class="notice"><strong>Budget 2025 Update:</strong> Under New Regime, income up to Rs.12 lakh is effectively tax-free (Rs.75K standard deduction + rebate u/s 87A). New Regime is now the default for salaried employees. Review your regime!</div>
 <div class="sgrid">
 <div class="sc sf"><div class="sico">Rs.</div><div class="slbl">Gross Income</div><div class="sval" id="di">Rs.0</div><div class="ssub">FY 2024-25</div></div>
-<div class="sc gn"><div class="sico">*</div><div class="slbl">Total Deductions</div><div class="sval" id="dd">Rs.0</div><div class="ssub">All sections</div></div>
-<div class="sc gld"><div class="sico">%</div><div class="slbl">Taxable Income</div><div class="sval" id="dt">Rs.0</div><div class="ssub">After deductions</div></div>
+<div class="sc gn"><div class="sico">*</div><div class="slbl">Tax You Can Save</div><div class="sval" id="dts">Rs.0</div><div class="ssub">By optimizing deductions</div></div>
+<div class="sc gld"><div class="sico">%</div><div class="slbl">80C Room Left</div><div class="sval" id="d80cr">Rs.1,50,000</div><div class="ssub" id="d80cp">0% utilized</div></div>
 <div class="sc in"><div class="sico">!</div><div class="slbl">Tax Liability</div><div class="sval" id="dx">Rs.0</div><div class="ssub" id="dr">Old Regime</div></div>
 </div>
 <div class="dgrid">
 <div class="card">
-<div class="ctitle"><span class="dot dsf"></span>Deduction Utilisation</div>
+<div class="ctitle"><span class="dot dsf"></span>Your Action Plan <span style="font-size:10px;color:var(--tx3);font-weight:400;margin-left:auto">Live updates as you enter income</span></div>
+<div class="action-plan" id="actionPlan">
+<div class="ap-item normal"><span class="ap-ico">&#129518;</span><div><div class="ap-title">Enter your income in Tax Calculator</div><div class="ap-desc">Your personalised action plan with specific investment steps, fund names, and SIP amounts will appear here automatically.</div></div></div>
+</div>
+</div>
+<div class="card">
+<div class="ctitle"><span class="dot dgn"></span>Deduction Utilisation</div>
 <div class="pi"><div class="plab"><span>80C - Investments</span><span id="p80c">Rs.0 / Rs.1,50,000</span></div><div class="pb"><div class="pf" style="background:var(--sf2);width:0%" id="pb80c"></div></div></div>
 <div class="pi"><div class="plab"><span>80D - Health Insurance</span><span id="p80d">Rs.0 / Rs.25,000</span></div><div class="pb"><div class="pf" style="background:var(--gn2);width:0%" id="pb80d"></div></div></div>
 <div class="pi"><div class="plab"><span>HRA Exemption</span><span id="phra">Rs.0</span></div><div class="pb"><div class="pf" style="background:var(--gld);width:0%" id="pbhra"></div></div></div>
@@ -359,6 +368,129 @@ function doPost(e){
 </div>
 </div>
 </div>
+
+<!-- AI ADVISOR PANEL -->
+<div class="panel" id="panel-advisor">
+<div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px">AI Tax Advisor</div>
+<div style="font-size:13px;color:var(--tx3);margin-bottom:20px">Enter your monthly salary once — get personalised, specific tax-saving steps</div>
+<div style="background:linear-gradient(135deg,var(--nv),var(--nv2));border-radius:var(--r);padding:22px;color:#fff;margin-bottom:20px">
+<div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px">Quick Income Profile</div>
+<div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:18px">Fill once — recommendations update automatically</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">Monthly Basic Salary</label><input type="number" id="pBasic" placeholder="50000" oninput="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"></div>
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">Monthly HRA Received</label><input type="number" id="pHRA" placeholder="20000" oninput="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"></div>
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">Special Allowance (Monthly)</label><input type="number" id="pSpl" placeholder="15000" oninput="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"></div>
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">EPF Deducted (Monthly)</label><input type="number" id="pEPF" placeholder="3600" oninput="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"></div>
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">Annual Rent Paid</label><input type="number" id="pRent" placeholder="240000" oninput="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"></div>
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">City Type</label><select id="pCity" onchange="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"><option value="metro">Metro City</option><option value="non">Non-Metro</option></select></div>
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">LIC / Insurance (Annual)</label><input type="number" id="pLIC" placeholder="20000" oninput="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"></div>
+<div><label style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">Home Loan Interest (Annual)</label><input type="number" id="pHLI" placeholder="0" oninput="syncProfile()" style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font-size:13px;outline:none"></div>
+<div style="display:flex;align-items:flex-end"><button onclick="syncProfile()" style="width:100%;padding:10px;background:linear-gradient(135deg,var(--sf),var(--sf2));border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Update</button></div>
+</div></div>
+<div style="display:grid;grid-template-columns:3fr 2fr;gap:18px">
+<div class="card"><div class="ctitle"><span class="dot dsf"></span>What You Should Do Right Now</div>
+<div id="adviceList" class="action-plan">
+<div class="ap-item normal"><span class="ap-ico">&#128161;</span><div><div class="ap-title">Fill your income profile above</div><div class="ap-desc">Enter your monthly salary to get specific, actionable tax-saving steps with exact amounts and fund names.</div></div></div>
+</div></div>
+<div class="card"><div class="ctitle"><span class="dot dgn"></span>Your Tax Summary</div>
+<div id="profileSummary" style="color:var(--tx3);font-size:13px;line-height:1.8">Fill the income profile to see a detailed tax breakdown.</div>
+</div></div>
+</div>
+
+<!-- INVESTMENT PLANNER PANEL -->
+<div class="panel" id="panel-investments">
+<div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px">Investment Planner</div>
+<div style="font-size:13px;color:var(--tx3);margin-bottom:20px">Specific fund recommendations to save tax and grow wealth</div>
+<div style="display:grid;grid-template-columns:3fr 2fr;gap:18px;margin-bottom:18px">
+<div>
+<div class="card" style="margin-bottom:16px">
+<div class="ctitle"><span class="dot dsf"></span>80C — ELSS Tax Saving Funds <span class="chip csf">3-yr lock-in</span></div>
+<div style="font-size:12px;color:var(--tx2);margin-bottom:12px">Best returns among all 80C instruments. Invest via monthly SIP for rupee-cost averaging.</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div style="background:var(--gnp);border:1px solid rgba(14,122,61,.25);border-radius:10px;padding:14px">
+<div style="font-size:10px;font-weight:700;color:var(--gn);margin-bottom:4px">⭐ TOP PICK</div>
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">Mirae Asset Tax Saver</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:8px">ELSS · Large Cap Blend</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">18.2%</span><span style="font-size:10px;background:#EAF5EE;color:var(--gn);padding:2px 7px;border-radius:4px;font-weight:600">Medium Risk</span></div>
+<div style="font-size:10px;color:var(--tx3);margin-top:5px">5-yr CAGR · Expense: 0.53%</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">Axis Long Term Equity</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:8px">ELSS · Large & Mid Cap</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">16.8%</span><span style="font-size:10px;background:#EAF5EE;color:var(--gn);padding:2px 7px;border-radius:4px;font-weight:600">Medium Risk</span></div>
+<div style="font-size:10px;color:var(--tx3);margin-top:5px">5-yr CAGR · Expense: 0.58%</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">Quant Tax Plan</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:8px">ELSS · Flexi Cap</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">26.4%</span><span style="font-size:10px;background:#FEF3EA;color:var(--sf);padding:2px 7px;border-radius:4px;font-weight:600">High Risk</span></div>
+<div style="font-size:10px;color:var(--tx3);margin-top:5px">5-yr CAGR · Expense: 0.57%</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">SBI Long Term Equity</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:8px">ELSS · Large Cap</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">15.9%</span><span style="font-size:10px;background:#EAF5EE;color:var(--gn);padding:2px 7px;border-radius:4px;font-weight:600">Low-Med</span></div>
+<div style="font-size:10px;color:var(--tx3);margin-top:5px">5-yr CAGR · Expense: 0.92%</div></div>
+</div></div>
+<div class="card">
+<div class="ctitle"><span class="dot dgn"></span>80C — Safe Government Schemes</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div style="background:var(--gnp);border:1px solid rgba(14,122,61,.25);border-radius:10px;padding:14px">
+<div style="font-size:10px;font-weight:700;color:var(--gn);margin-bottom:4px">⭐ SAFEST PICK</div>
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">PPF (Public Provident Fund)</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">EEE Tax Status · 15-yr lock-in</div>
+<div style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">7.1%</div>
+<div style="font-size:10px;color:var(--tx3);margin-top:3px">Open at Post Office / SBI / ICICI</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">NSC (National Savings Cert)</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">Post Office · 5-yr lock-in</div>
+<div style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">7.7%</div>
+<div style="font-size:10px;color:var(--tx3);margin-top:3px">Available at any Post Office</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">5-Year Bank FD</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">Tax-saving FD · Interest taxable</div>
+<div style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">~7.0%</div>
+<div style="font-size:10px;color:var(--tx3);margin-top:3px">Available at all major banks</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">Sukanya Samriddhi (SSY)</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">Girl child · EEE status</div>
+<div style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">8.2%</div>
+<div style="font-size:10px;color:var(--tx3);margin-top:3px">For girl below 10 yrs | Post Office</div></div>
+</div></div>
+</div>
+<div>
+<div class="card" style="margin-bottom:16px">
+<div class="ctitle"><span class="dot dgld"></span>SIP Planner — Reach 80C by March</div>
+<div style="background:linear-gradient(135deg,var(--nv),var(--nv2));border-radius:10px;padding:16px;color:#fff">
+<div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:rgba(255,255,255,.5)">80C Room Left</span><span style="font-family:monospace;font-size:14px;font-weight:700;color:var(--sf2)" id="sipRoom">Rs.1,50,000</span></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:rgba(255,255,255,.5)">Months Remaining</span><span style="font-family:monospace;font-size:14px;font-weight:700;color:var(--sf2)" id="sipMonths">—</span></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:12px;color:rgba(255,255,255,.5)">SIP Needed/Month</span><span style="font-family:monospace;font-size:14px;font-weight:700;color:var(--sf2)" id="sipAmt">—</span></div>
+<div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px">Monthly FY progress (Apr → Mar)</div>
+<div id="sipMonthDots" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+</div></div>
+<div class="card" style="margin-bottom:16px">
+<div class="ctitle"><span class="dot dgld"></span>NPS — Extra Rs.50K Deduction</div>
+<div style="background:var(--gnp);border:1px solid rgba(14,122,61,.2);border-radius:10px;padding:14px;margin-bottom:10px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">NPS Tier I — Active Choice</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">80CCD(1B) · Over and above 80C</div>
+<div style="font-family:monospace;font-size:18px;font-weight:700;color:var(--gn)">~10–12%</div>
+<div style="font-size:10px;color:var(--tx3);margin-top:3px">Open at NSDL / HDFC / SBI / ICICI</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">Atal Pension Yojana (APY)</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">Guaranteed pension · Ages 18–40</div>
+<div style="font-size:12px;color:var(--tx2)">Rs.1,000–5,000/month guaranteed pension at 60. Premium: Rs.42–1,454/month.</div></div>
+</div>
+<div class="card">
+<div class="ctitle"><span class="dot din"></span>80D — Health Insurance</div>
+<div style="background:var(--gnp);border:1px solid rgba(14,122,61,.2);border-radius:10px;padding:14px;margin-bottom:10px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">Star Health Family Floater</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">Rs.5–10L cover for family of 4</div>
+<div style="font-size:12px;color:var(--tx2)">Premium: Rs.12,000–22,000/yr. 80D deduction: Rs.25,000 self + Rs.25,000 parents.</div></div>
+<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px">
+<div style="font-size:13px;font-weight:700;margin-bottom:3px">HDFC ERGO Optima Restore</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:6px">Restore benefit after claim</div>
+<div style="font-size:12px;color:var(--tx2)">Rs.5L cover at ~Rs.8,000/yr. Covers pre-existing after waiting period.</div></div>
+</div>
+</div></div>
+</div>
+
 <!-- CALCULATOR -->
 <div class="panel" id="panel-calculator">
 <div class="clayout">
@@ -596,10 +728,11 @@ Home loan interest certificate<br>Capital gains statement (broker/CDSL)<br>Rent 
 </div>
 </div>
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
 const SID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
 let ASU=localStorage.getItem('tm_asu')||'https://script.google.com/macros/s/AKfycbxIg-F7qlhE1PA97vFWO9DseDG0c3Hkl2MxV_8b-q7tQy5dqeY4TP28X1sRQ-fV0CU7hw/exec';
 let CU=null,CR='old',CFY='2024-25';
-let TR={old:0,ne:0,ti:0,gross:0,ded:0,hra:0,oR:null,nR:null};
+let TR={old:0,ne:0,ti:0,gross:0,ded:0,hra:0,oR:null,nR:null,d1:0,d2:0,d3:0};
 const fmt=v=>!v||isNaN(v)?'Rs.0':'Rs.'+Math.round(v).toLocaleString('en-IN');
 const n=id=>parseFloat(document.getElementById(id)?.value)||0;
 const el=id=>document.getElementById(id);
@@ -624,6 +757,9 @@ function parseCSV(txt){
 }
 function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){if(l[i]==='"'){q=!q;continue;}if(l[i]===','&&!q){r.push(c);c='';continue;}c+=l[i];}r.push(c);return r;}
 function wrSh(action,data){
+  return gCall({action,...data});
+}
+function _wrShOLD(action,data){
   if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return Promise.resolve(false);}
   return new Promise((resolve)=>{
     // JSONP via script tag - zero CORS issues, works everywhere with Apps Script
@@ -673,19 +809,9 @@ async function login(){
   if(em==='demo@taxmaga.in'&&pw==='demo1234'){loginOK({FirstName:'Demo',LastName:'User',Email:em,PAN:'DEMO01234A',Mobile:'9999999999',DOB:'1990-01-01',AY:'AY 2025-26',Status:'approved'});return;}
   sL('Verifying credentials...');
   // Use Apps Script to fetch user — avoids sheet sharing/gid issues entirely
-  const result=await new Promise((resolve)=>{
-    const cbName='_lcb_'+Date.now();
-    window[cbName]=(res)=>{delete window[cbName];if(sc)sc.remove();resolve(res);};
-    const params=encodeURIComponent(JSON.stringify({action:'login',email:em,password:pw}));
-    const url=ASU+'?data='+params+'&callback='+encodeURIComponent(cbName);
-    const sc=document.createElement('script');
-    sc.src=url;
-    sc.onerror=()=>{delete window[cbName];sc.remove();resolve(null);};
-    document.head.appendChild(sc);
-    setTimeout(()=>{if(window[cbName]){delete window[cbName];if(sc)sc.remove();resolve(null);}},8000);
-  });
+  const result=await gCall({action:'login',email:em,password:pw});
   hL();
-  if(!result){ee.textContent='Could not reach Google Sheets. Check internet connection.';ee.style.display='block';return;}
+  if(!result){ee.textContent='Could not reach Google Sheets. Use demo@taxmaga.in / demo1234 to test.';ee.style.display='block';return;}
   if(!result.success){ee.textContent=result.error||'Login failed.';ee.style.display='block';return;}
   loginOK(result.user);
 }
@@ -701,7 +827,7 @@ function loginOK(u){
   toast('Welcome back '+u.FirstName+'!','s');
 }
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));el(id).classList.add('active');}
-const PT={dashboard:'Dashboard',calculator:'Tax Calculator',deductions:'Deductions and Savings',regimecompare:'Regime Comparison',itrguide:'ITR Form Guide',history:'Tax History',profile:'My Profile'};
+const PT={dashboard:'Smart Dashboard',advisor:'AI Tax Advisor',investments:'Investment Planner',calculator:'Tax Calculator',deductions:'Deductions',regimecompare:'Regime Comparison',itrguide:'ITR Form Guide',history:'Tax History',profile:'My Profile'};
 function showP(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el('panel-'+id)?.classList.add('active');
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
@@ -736,7 +862,7 @@ function calc(){
   const tiO=Math.max(0,gross-stdO-hraEx-ch6-d4),tiN=Math.max(0,gross-stdN);
   const oR=cOld(tiO),nR=cNew(tiN);
   const aR=CR==='old'?oR:nR,aTI=CR==='old'?tiO:tiN;
-  TR={gross,ded:ch6+hraEx+d4+(CR==='old'?stdO:stdN),ti:aTI,old:oR.total,ne:nR.total,hra:hraEx,ch6,d4,stdO,stdN,oR,nR};
+  TR={gross,ded:ch6+hraEx+d4+(CR==='old'?stdO:stdN),ti:aTI,old:oR.total,ne:nR.total,hra:hraEx,ch6,d4,stdO,stdN,oR,nR,d1,d2,d3};
   tx('rg',fmt(gross));tx('rs','-'+fmt(CR==='old'?stdO:stdN));tx('rh','-'+fmt(hraEx));
   tx('rc6',CR==='old'?'-'+fmt(ch6):'N/A');tx('rhl',CR==='old'?'-'+fmt(d4):'N/A');
   tx('rti',fmt(aTI));tx('rtx',fmt(aR.tax));tx('rsc',fmt(aR.sur));tx('rcs',fmt(aR.cess));
@@ -748,9 +874,15 @@ function calc(){
   const re=el('rrec');
   if(gross>0){re.style.display='block';re.textContent=win==='old'?'Old Regime saves '+fmt(diff)+' - your deductions are working hard!':'New Regime saves '+fmt(diff)+' - simpler and cheaper for your income!';}
   updDash(gross,TR.ded,aTI,aR.total,d1,d2,hraEx,d3);updHealth(d1,d2,d3);
+  const winR=oR.total<=nR.total?'old':'new',diffR=Math.abs(oR.total-nR.total);
+  updActionPlan(gross,d1,d2,d3,oR.total,nR.total,winR,diffR);
+  updSIP(d1);
 }
 function updDash(g,d,ti,tx2,d1,d2,hra,nps){
-  tx('di',fmt(g));tx('dd',fmt(d));tx('dt',fmt(ti));tx('dx',fmt(tx2));tx('dr',CR==='old'?'Old Regime':'New Regime');
+  const potSave=Math.round((Math.max(0,150000-d1)+Math.max(0,25000-d2)+Math.max(0,50000-nps))*(g>1000000?.3:g>500000?.2:.05)*1.04);
+  tx('di',fmt(g));tx('dts',fmt(potSave));
+  tx('d80cr',fmt(Math.max(0,150000-d1)));tx('d80cp',Math.round((d1/150000)*100)+'% utilized');
+  tx('dx',fmt(tx2));tx('dr',CR==='old'?'Old Regime':'New Regime');
   el('pb80c').style.width=Math.min(100,(d1/150000)*100)+'%';
   el('pb80d').style.width=Math.min(100,(d2/25000)*100)+'%';
   el('pbhra').style.width=Math.min(100,(hra/(g*.4+1))*100)+'%';
@@ -825,12 +957,101 @@ function updHealth(d1,d2,nps){
   el('h80d').textContent=d2>0?'Health insurance added':'Health insurance not added';
   el('hnps').textContent=nps>0?'NPS contribution active':'NPS not contributing';
 }
+
+function gCall(params){
+  return new Promise(resolve=>{
+    const cb='_cb_'+Date.now();
+    window[cb]=res=>{delete window[cb];if(sc)sc.remove();resolve(res);};
+    const url=ASU+'?data='+encodeURIComponent(JSON.stringify(params))+'&callback='+encodeURIComponent(cb);
+    const sc=document.createElement('script');
+    sc.src=url;sc.onerror=()=>{delete window[cb];sc.remove();resolve(null);};
+    document.head.appendChild(sc);
+    setTimeout(()=>{if(window[cb]){delete window[cb];if(sc)sc.remove();resolve(null);}},8000);
+  });
+}
+function updSIP(d1){
+  const room=Math.max(0,150000-d1);
+  const now=new Date(),curM=now.getMonth(),fyM=curM>=3?curM-3:curM+9,mLeft=Math.max(1,12-fyM);
+  const sipAmt=room>0?Math.ceil(room/mLeft/100)*100:0;
+  const e1=document.getElementById('sipRoom'),e2=document.getElementById('sipMonths'),e3=document.getElementById('sipAmt'),e4=document.getElementById('sipMonthDots');
+  if(!e1)return;
+  e1.textContent=fmt(room);e2.textContent=mLeft+' months';
+  e3.textContent=room>0?fmt(sipAmt)+'/month':'Fully Invested!';
+  if(e4){
+    const months=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+    e4.innerHTML=months.map((m,i)=>'<div class="sip-month '+(i<fyM?'done':i===fyM?'cur':'todo')+'" title="'+m+'">'+m[0]+'</div>').join('');
+  }
+}
+function updActionPlan(gross,d1,d2,nps,oldTax,newTax,win,diff){
+  const ap=document.getElementById('actionPlan');
+  if(!ap||!gross)return;
+  const room80c=Math.max(0,150000-d1),room80d=Math.max(0,25000-d2),roomNPS=Math.max(0,50000-nps);
+  const slab=gross>1000000?.3:gross>500000?.2:.05;
+  const now=new Date(),fyM=now.getMonth()>=3?now.getMonth()-3:now.getMonth()+9,mLeft=Math.max(1,12-fyM);
+  const actions=[];
+  if(win==='new'&&diff>0)actions.push({type:'normal',ico:'⚖️',title:'Switch to New Regime — Save '+fmt(diff),desc:'New Regime saves more for your income. Inform your employer at the start of FY.',meta:'Action: Declare regime to employer each April'});
+  else if(diff>0)actions.push({type:'normal',ico:'⚖️',title:'Stay on Old Regime — Save '+fmt(diff),desc:'Your deductions make Old Regime '+fmt(diff)+' cheaper. Keep investing to maintain this advantage.',meta:'Action: Keep 80C, 80D, HRA claims intact'});
+  if(room80c>0){
+    const sip=Math.ceil(room80c/mLeft/100)*100;
+    actions.push({type:'normal',ico:'📈',title:'Invest '+fmt(room80c)+' more in 80C — Save '+fmt(Math.round(room80c*slab*1.04)),desc:'Start SIP of '+fmt(sip)+'/month in ELSS (e.g. Mirae Asset Tax Saver). 3-year lock-in, ~16–18% historical returns.',meta:'Deadline: 31 Mar 2025 | Platforms: Groww, Zerodha Coin, Kuvera'});
+  }
+  if(room80d>0)actions.push({type:'normal',ico:'🏥',title:'Buy Health Insurance — Save upto '+fmt(Math.round(room80d*slab*1.04)),desc:'Rs.25,000 deductible for self+family under 80D. Star Health Family Floater (~Rs.12,000/yr for Rs.5L cover).',meta:'Also: Add parents for extra Rs.25,000–50,000 deduction'});
+  if(roomNPS>0)actions.push({type:'normal',ico:'🏦',title:'Open NPS — Extra '+fmt(Math.round(roomNPS*slab*1.04))+' saved beyond 80C',desc:'80CCD(1B) gives Rs.50,000 extra deduction over 80C. Open Tier I on NSDL or through your bank. Start '+fmt(Math.ceil(roomNPS/mLeft/100)*100)+'/month.',meta:'Available: HDFC, ICICI, SBI NPS accounts | Returns: ~10–12%'});
+  if(!actions.length||(!room80c&&!room80d&&!roomNPS))actions.push({type:'done',ico:'✅',title:'All major deductions optimised!',desc:'You are making the most of available tax deductions. Consider LTCG harvesting, HUF, or additional employer NPS.',meta:'File ITR before 31 Jul 2025'});
+  const today=new Date(),daysLeft=Math.ceil((new Date('2025-07-31')-today)/(864e5));
+  if(daysLeft>0&&daysLeft<120)actions.push({type:daysLeft<30?'urgent':'normal',ico:'📅',title:'File ITR — '+daysLeft+' days left',desc:'Deadline: 31 July 2025. Collect Form 16 from employer, check Form 26AS on incometax.gov.in.',meta:'Belated return penalty: Rs.1,000–5,000 after deadline'});
+  ap.innerHTML=actions.map(a=>'<div class="ap-item '+a.type+'"><span class="ap-ico">'+a.ico+'</span><div style="flex:1"><div class="ap-title">'+a.title+'</div><div class="ap-desc">'+a.desc+'</div><div class="ap-meta">'+a.meta+'</div></div></div>').join('');
+}
+function syncProfile(){
+  const basic=parseFloat(document.getElementById('pBasic')?.value)||0;
+  const hra=parseFloat(document.getElementById('pHRA')?.value)||0;
+  const spl=parseFloat(document.getElementById('pSpl')?.value)||0;
+  const epf=parseFloat(document.getElementById('pEPF')?.value)||0;
+  const rent=parseFloat(document.getElementById('pRent')?.value)||0;
+  const city=document.getElementById('pCity')?.value||'metro';
+  const lic=parseFloat(document.getElementById('pLIC')?.value)||0;
+  const hli=parseFloat(document.getElementById('pHLI')?.value)||0;
+  if(!basic)return;
+  const gross=(basic+hra+spl)*12,annBasic=basic*12,annHRA=hra*12,annEPF=epf*12;
+  const hraEx=rent>0?Math.min(annHRA,annBasic*(city==='metro'?.5:.4),Math.max(0,rent-annBasic*.1)):0;
+  const c80c=Math.min(annEPF+lic,150000),room80c=Math.max(0,150000-c80c);
+  const slab=gross>1000000?.3:gross>500000?.2:.05;
+  const now=new Date(),fyM=now.getMonth()>=3?now.getMonth()-3:now.getMonth()+9,mLeft=Math.max(1,12-fyM);
+  const sipN=Math.ceil(room80c/mLeft/100)*100;
+  const potSave=Math.round((room80c+25000+50000)*slab*1.04);
+  const tiO=Math.max(0,gross-50000-hraEx-c80c-Math.min(hli,200000));
+  const oTax=cOld(tiO).total,tiN=Math.max(0,gross-75000),nTax=cNew(tiN).total;
+  const winR=oTax<=nTax?'Old':'New';
+  const al=document.getElementById('adviceList');
+  if(al){
+    const items=[];
+    if(room80c>0)items.push({ico:'📈',title:'Start ELSS SIP of '+fmt(sipN)+'/month',desc:'You have '+fmt(room80c)+' of 80C room left. EPF covers '+fmt(annEPF)+(lic?' and LIC '+fmt(lic):'')+'. Invest '+fmt(room80c)+' in ELSS to save '+fmt(Math.round(room80c*slab*1.04))+' in tax.',bg:'var(--sfp)',bc:'rgba(232,104,26,.2)'});
+    else items.push({ico:'✅',title:'80C fully covered!',desc:'EPF ('+fmt(annEPF)+(lic?' + LIC '+fmt(lic):'')+') fills the Rs.1.5L limit.',bg:'var(--gnp)',bc:'rgba(14,122,61,.2)'});
+    items.push({ico:'🏥',title:'Buy health insurance — Save '+fmt(Math.round(25000*slab*1.04)),desc:'Rs.25,000 deduction under 80D. Star Health/HDFC ERGO (~Rs.12,000–18,000/yr for Rs.5L family cover). Parents add Rs.25,000–50,000 more.',bg:'#EFF3FF',bc:'rgba(42,74,127,.2)'});
+    items.push({ico:'🏦',title:'Open NPS Tier I — Save '+fmt(Math.round(50000*slab*1.04))+' extra',desc:'Rs.50,000 extra beyond 80C via 80CCD(1B). Invest '+fmt(Math.ceil(50000/mLeft/100)*100)+'/month for '+mLeft+' months. Open on NSDL or bank.',bg:'#FFF8E8',bc:'rgba(200,150,30,.2)'});
+    if(hli>0)items.push({ico:'🏠',title:'Home Loan Interest — '+fmt(Math.min(hli,200000))+' deduction (Sec 24b)',desc:'Saves '+fmt(Math.round(Math.min(hli,200000)*slab*1.04))+' in tax. Claim under Old Regime only. Get interest certificate from your bank.',bg:'var(--gnp)',bc:'rgba(14,122,61,.2)'});
+    al.innerHTML=items.map(it=>'<div class="ap-item normal" style="background:'+it.bg+';border:1px solid '+it.bc+';border-left:4px solid '+it.bc+'"><span class="ap-ico">'+it.ico+'</span><div><div class="ap-title">'+it.title+'</div><div class="ap-desc">'+it.desc+'</div></div></div>').join('');
+  }
+  const ps=document.getElementById('profileSummary');
+  if(ps){
+    ps.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      +'<div style="padding:10px;background:var(--cr);border-radius:8px"><div style="font-size:10px;color:var(--tx3);margin-bottom:3px">GROSS INCOME</div><div style="font-family:monospace;font-weight:700;font-size:15px">'+fmt(gross)+'</div></div>'
+      +'<div style="padding:10px;background:var(--cr);border-radius:8px"><div style="font-size:10px;color:var(--tx3);margin-bottom:3px">HRA EXEMPTION</div><div style="font-family:monospace;font-weight:700;font-size:15px;color:var(--gn)">'+fmt(hraEx)+'</div></div>'
+      +'<div style="padding:10px;background:var(--cr);border-radius:8px"><div style="font-size:10px;color:var(--tx3);margin-bottom:3px">80C INVESTED</div><div style="font-family:monospace;font-weight:700;font-size:15px">'+fmt(c80c)+' / Rs.1,50,000</div></div>'
+      +'<div style="padding:10px;background:var(--cr);border-radius:8px"><div style="font-size:10px;color:var(--tx3);margin-bottom:3px">POTENTIAL SAVING</div><div style="font-family:monospace;font-weight:700;font-size:15px;color:var(--gn)">'+fmt(potSave)+'</div></div>'
+      +'<div style="padding:10px;background:var(--cr);border-radius:8px"><div style="font-size:10px;color:var(--tx3);margin-bottom:3px">OLD REGIME TAX</div><div style="font-family:monospace;font-weight:700;font-size:15px;color:var(--sf)">'+fmt(oTax)+'</div></div>'
+      +'<div style="padding:10px;background:var(--cr);border-radius:8px"><div style="font-size:10px;color:var(--tx3);margin-bottom:3px">NEW REGIME TAX</div><div style="font-family:monospace;font-weight:700;font-size:15px;color:var(--in)">'+fmt(nTax)+'</div></div>'
+      +'</div><div style="margin-top:12px;padding:10px 14px;background:'+(winR==='Old'?'var(--sfp)':'var(--gnp)')+';border-radius:8px;font-size:13px;font-weight:700;color:'+(winR==='Old'?'var(--sf)':'var(--gn)')+'">▶ '+winR+' Regime saves you '+fmt(Math.abs(oTax-nTax))+'</div>';
+  }
+}
+
 window.onload=()=>{
   const sv=sessionStorage.getItem('tm_u');
   if(sv){try{loginOK(JSON.parse(sv));}catch(e){}}
   if(ASU)el('murl').value=ASU;
   calc();updDed();
 };
+
 </script>
 </body>
 </html>
