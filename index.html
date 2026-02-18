@@ -606,9 +606,14 @@ async function wrSh(action,data){
   try{
     const r = await fetch(ASU,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action,...data})
-    });
+      const formData = new URLSearchParams();
+formData.append("data", JSON.stringify({action,...data}));
+
+const r = await fetch(ASU,{
+  method:'POST',
+  body: formData
+});
+
 
     const j = await r.json();
     return j.success;
