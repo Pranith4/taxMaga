@@ -200,7 +200,7 @@ input,select,button{font-family:'DM Sans',sans-serif}
 <p><strong>Steps:</strong> Open Sheet &rarr; Extensions &rarr; Apps Script &rarr; Paste code below &rarr; Deploy as Web App (Execute as: Me, Access: Anyone) &rarr; Copy URL</p>
 <pre>const SS_ID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
 
-function doPost(e){
+function doGet(e){
   try{
     const d=JSON.parse(e.parameter.data);
     const ss=SpreadsheetApp.openById(SS_ID);
@@ -213,8 +213,7 @@ function doPost(e){
           'PAN','Mobile','DOB','AY','Status','RegisteredOn']);
       }
       s.appendRow(d.row);
-
-    }else if(d.action==='save_tax'){
+    } else if(d.action==='save_tax'){
       let s=ss.getSheetByName('TaxData');
       if(!s){
         s=ss.insertSheet('TaxData');
@@ -225,25 +224,23 @@ function doPost(e){
       s.appendRow(d.row);
     }
 
+    const cb=e.parameter.callback;
+    const json=JSON.stringify({success:true});
+    const out=cb ? cb+'('+json+')' : json;
     return ContentService
-      .createTextOutput(JSON.stringify({success:true}))
-      .setMimeType(ContentService.MimeType.JSON);
+      .createTextOutput(out)
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
 
   }catch(err){
+    const cb=e.parameter.callback||'cb';
     return ContentService
-      .createTextOutput(JSON.stringify({success:false,error:err.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
+      .createTextOutput(cb+'('+JSON.stringify({success:false,error:err.toString()})+')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
 }
 
-function doGet(e){
-  // Also handle GET requests as fallback (for testing)
-  if(e && e.parameter && e.parameter.data){
-    return doPost(e);
-  }
-  return ContentService
-    .createTextOutput('Tax-Maga Apps Script OK')
-    .setMimeType(ContentService.MimeType.TEXT);
+function doPost(e){
+  return doGet(e);
 }</pre>
 <p style="background:#FEF3EA;border-radius:7px;padding:9px 12px;font-size:11px;"><strong>Sheet Setup:</strong> Users tab headers: FirstName | LastName | Email | Password | PAN | Mobile | DOB | AY | <strong>Status</strong> | RegisteredOn<br>To approve a user: Change their Status from <strong>pending</strong> to <strong>approved</strong></p>
 <input type="url" id="murl" placeholder="https://script.google.com/macros/s/.../exec">
@@ -629,37 +626,20 @@ function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){if
 function wrSh(action,data){
   if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return Promise.resolve(false);}
   return new Promise((resolve)=>{
-    // Hidden iframe form POST — only reliable cross-origin method for Apps Script
-    const ifrId='_gsIframe_'+Date.now();
-    const ifr=document.createElement('iframe');
-    ifr.name=ifrId;ifr.style.display='none';
-    document.body.appendChild(ifr);
-
-    const frm=document.createElement('form');
-    frm.method='POST';
-    frm.action=ASU;
-    frm.target=ifrId;
-    frm.enctype='application/x-www-form-urlencoded';
-    frm.style.display='none';
-
-    const inp=document.createElement('input');
-    inp.type='hidden';inp.name='data';
-    inp.value=JSON.stringify({action,...data});
-    frm.appendChild(inp);
-    document.body.appendChild(frm);
-
-    // Resolve true after submit (can't read response due to cross-origin)
-    ifr.onload=()=>{
-      setTimeout(()=>{
-        ifr.remove();frm.remove();
-      },1000);
-      resolve(true);
+    // JSONP via script tag - zero CORS issues, works everywhere with Apps Script
+    const cbName='_cb_'+Date.now();
+    window[cbName]=(res)=>{
+      delete window[cbName];
+      if(sc)sc.remove();
+      resolve(res&&res.success===true);
     };
-
-    // Timeout fallback
-    setTimeout(()=>{ifr.remove();frm.remove();resolve(true);},6000);
-
-    frm.submit();
+    const payload=JSON.stringify({action,...data});
+    const url=ASU+'?data='+encodeURIComponent(payload)+'&callback='+encodeURIComponent(cbName);
+    const sc=document.createElement('script');
+    sc.src=url;
+    sc.onerror=()=>{delete window[cbName];sc.remove();resolve(false);};
+    document.head.appendChild(sc);
+    setTimeout(()=>{if(window[cbName]){delete window[cbName];if(sc)sc.remove();resolve(false);}},8000);
   });
 }
 async function register(){
@@ -834,7 +814,7 @@ function updHealth(d1,d2,nps){
   el('hring').style.background='conic-gradient(var(--gn2) 0% '+s+'%,rgba(255,255,255,.08) '+s+'% 100%)';
   el('h80c').textContent=d1>=150000?'80C fully utilized!':'80C not fully utilized';
   el('h80d').textContent=d2>0?'Health insurance added':'Health insurance not added';
-  el('h80n').textContent=nps>0?'NPS contribution active':'NPS not contributing';
+  el('hnps').textContent=nps>0?'NPS contribution active':'NPS not contributing';
 }
 window.onload=()=>{
   const sv=sessionStorage.getItem('tm_u');
