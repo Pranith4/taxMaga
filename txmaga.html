@@ -576,7 +576,7 @@ Home loan interest certificate<br>Capital gains statement (broker/CDSL)<br>Rent 
 </div>
 <script>
 const SID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
-let ASU=localStorage.getItem('tm_asu')||'';
+let ASU = "https://script.google.com/macros/s/AKfycbygyoQdLG-glML_gcEEZ3l9d4WIjYwj0FkiHfyGyjyJ50ZhGVX6K5M1TVvzndudfbaBnA/exec";
 let CU=null,CR='old',CFY='2024-25';
 let TR={old:0,ne:0,ti:0,gross:0,ded:0,hra:0,oR:null,nR:null};
 const fmt=v=>!v||isNaN(v)?'Rs.0':'Rs.'+Math.round(v).toLocaleString('en-IN');
@@ -603,9 +603,21 @@ function parseCSV(txt){
 }
 function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){if(l[i]==='"'){q=!q;continue;}if(l[i]===','&&!q){r.push(c);c='';continue;}c+=l[i];}r.push(c);return r;}
 async function wrSh(action,data){
-  if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return false;}
-  try{const r=await fetch(ASU,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...data})});const j=await r.json();return j.success;}
-  catch{toast('Sheet write failed. Check Apps Script URL.','e');return false;}
+  try{
+    const r = await fetch(ASU,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action,...data})
+    });
+
+    const j = await r.json();
+    return j.success;
+
+  }catch(e){
+    console.error(e);
+    toast('Connection failed. Check Apps Script deployment.','e');
+    return false;
+  }
 }
 async function register(){
   const fn=el('rfn').value.trim(),ln=el('rln').value.trim(),em=el('re').value.trim();
