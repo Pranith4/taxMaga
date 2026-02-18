@@ -798,7 +798,7 @@ function updHealth(d1,d2,nps){
   el('hring').style.background='conic-gradient(var(--gn2) 0% '+s+'%,rgba(255,255,255,.08) '+s+'% 100%)';
   el('h80c').textContent=d1>=150000?'80C fully utilized!':'80C not fully utilized';
   el('h80d').textContent=d2>0?'Health insurance added':'Health insurance not added';
-  'NPS contribution active':'NPS not contributing';
+  el('h80n').textContent=nps>0?'NPS contribution active':'NPS not contributing';
 }
 window.onload=()=>{
   const sv=sessionStorage.getItem('tm_u');
