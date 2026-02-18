@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tax-Maga | India's Smart Tax Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--sf:#E8681A;--sf2:#F08030;--sfp:#FEF3EA;--gn:#0E7A3D;--gn2:#14A355;--gnp:#EAF5EE;--nv:#09172B;--nv2:#132238;--in:#2A4A7F;--gld:#C8961E;--cr:#FDFBF7;--tx:#0F1E35;--tx2:#3A506B;--tx3:#6B829E;--bd:#DDE5EF;--r:14px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--cr);color:var(--tx);min-height:100vh;overflow-x:hidden}
+input,select,button{font-family:'DM Sans',sans-serif}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#C5D0E0;border-radius:3px}
+.page{display:none;min-height:100vh}.page.active{display:flex;flex-direction:column}
+#page-auth{background:var(--nv);align-items:center;justify-content:center;position:relative;overflow:hidden}
+#page-auth::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 15% 20%,rgba(232,104,26,.18) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 85% 80%,rgba(14,122,61,.15) 0%,transparent 60%);pointer-events:none}
+#page-auth::after{content:'\2638';position:absolute;font-size:500px;color:rgba(255,255,255,.02);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;line-height:1}
+.aw{position:relative;z-index:1;width:100%;max-width:480px;padding:24px;animation:fadeUp .5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.alo{text-align:center;margin-bottom:28px}
+.brand{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1}
+.brand .s{color:var(--sf2)}.brand .g{color:var(--gn2)}
+.tagline{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;margin-top:5px}
+.tribar{display:flex;gap:3px;justify-content:center;margin-top:10px}
+.tribar span{height:3px;width:30px;border-radius:2px}
+.t1{background:var(--sf2)}.t2{background:#fff}.t3{background:var(--gn2)}
+.acard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;backdrop-filter:blur(20px);overflow:hidden}
+.atabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08)}
+.atab{flex:1;padding:15px;background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.4);font-size:14px;font-weight:500;transition:all .2s;position:relative}
+.atab.active{color:#fff;background:rgba(255,255,255,.04)}
+.atab.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:var(--sf2);border-radius:2px 2px 0 0}
+.aform{padding:26px}.apanel{display:none}.apanel.active{display:block}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:11px;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.fg input,.fg select{width:100%;padding:11px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#fff;font-size:14px;outline:none;transition:all .2s}
+.fg input::placeholder{color:rgba(255,255,255,.22)}.fg input:focus,.fg select:focus{border-color:var(--sf2);box-shadow:0 0 0 3px rgba(232,104,26,.15)}
+.fg select option{background:#132238}.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;padding:13px;border:none;border-radius:9px;cursor:pointer;font-size:15px;font-weight:600;transition:all .22s}
+.btn-p{background:linear-gradient(135deg,var(--sf),var(--sf2));color:#fff}.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,104,26,.35)}
+.btn-g{background:linear-gradient(135deg,var(--gn),var(--gn2));color:#fff}.btn-g:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(14,122,61,.35)}
+.amsg{font-size:13px;text-align:center;margin-top:12px;color:rgba(255,255,255,.38)}
+.anote{background:rgba(14,122,61,.15);border:1px solid rgba(14,122,61,.25);border-radius:8px;padding:10px 13px;font-size:12px;color:rgba(255,255,255,.6);margin-bottom:18px;line-height:1.5}
+.emsg{color:#FF6B6B;font-size:12px;margin-top:7px;display:none}.smsg{color:#4ADE80;font-size:12px;margin-top:7px;display:none}
+#page-app{flex-direction:row;background:var(--cr)}
+.sidebar{width:255px;min-height:100vh;background:var(--nv2);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sl{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sl .brand{font-size:24px}.sl .sub{font-size:10px;color:rgba(255,255,255,.28);letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+.su{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px}
+.uav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--sf),var(--sf2));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.ui .uname{font-size:13px;font-weight:600;color:#fff}.ui .upan{font-size:10px;color:rgba(255,255,255,.32);font-family:'JetBrains Mono',monospace;margin-top:1px}
+.snav{padding:10px 0;flex:1;overflow-y:auto}
+.snl{font-size:10px;font-weight:600;color:rgba(255,255,255,.2);letter-spacing:.12em;text-transform:uppercase;padding:9px 18px 5px}
+.ni{display:flex;align-items:center;gap:11px;padding:10px 18px;cursor:pointer;color:rgba(255,255,255,.48);font-size:13px;border-left:3px solid transparent;transition:all .2s}
+.ni:hover{color:rgba(255,255,255,.82);background:rgba(255,255,255,.04)}.ni.active{color:#fff;background:rgba(232,104,26,.11);border-left-color:var(--sf2)}
+.ni .ico{font-size:17px;width:20px;text-align:center;flex-shrink:0}
+.sfooter{padding:14px 18px;border-top:1px solid rgba(255,255,255,.07)}
+.fyb{background:rgba(200,150,30,.14);border:1px solid rgba(200,150,30,.28);border-radius:7px;padding:7px 11px;font-size:11px;color:var(--gld);display:flex;justify-content:space-between;margin-bottom:8px}
+.blo{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;color:rgba(255,255,255,.38);font-size:12px;cursor:pointer;transition:all .2s}
+.blo:hover{background:rgba(255,80,80,.1);color:#FF6B6B;border-color:rgba(255,80,80,.18)}
+.mc{margin-left:255px;flex:1;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--bd);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.ttl{font-family:'Playfair Display',serif;font-size:21px;font-weight:700}
+.tact{display:flex;align-items:center;gap:10px}
+.fysel{padding:6px 11px;background:var(--cr);border:1px solid var(--bd);border-radius:7px;font-size:12px;outline:none;cursor:pointer}
+.rgt{display:flex;background:var(--cr);border:1px solid var(--bd);border-radius:7px;overflow:hidden}
+.rb{padding:6px 13px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--tx3);transition:all .2s}
+.rb.active{background:var(--nv2);color:#fff}
+.ca{padding:24px 28px;flex:1}.panel{display:none}.panel.active{display:block}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.sc{background:#fff;border-radius:var(--r);border:1px solid var(--bd);padding:18px;position:relative;overflow:hidden;transition:box-shadow .2s}
+.sc:hover{box-shadow:0 4px 20px rgba(9,23,43,.1)}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc.sf::before{background:linear-gradient(90deg,var(--sf),var(--sf2))}.sc.gn::before{background:linear-gradient(90deg,var(--gn),var(--gn2))}.sc.gld::before{background:linear-gradient(90deg,var(--gld),#E8B830)}.sc.in::before{background:linear-gradient(90deg,var(--in),#4A6FBF)}
+.slbl{font-size:11px;color:var(--tx3);font-weight:500;letter-spacing:.05em;margin-bottom:7px}
+.sval{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;line-height:1}
+.ssub{font-size:11px;color:var(--tx3);margin-top:5px}
+.sico{position:absolute;top:14px;right:14px;font-size:26px;opacity:.12}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:#fff;border-radius:var(--r);border:1px solid var(--bd);padding:20px}
+.ctitle{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%}.dsf{background:var(--sf2)}.dgn{background:var(--gn2)}.dgld{background:var(--gld)}.din{background:var(--in)}
+.pi{margin-bottom:12px}.plab{display:flex;justify-content:space-between;font-size:12px;color:var(--tx2);margin-bottom:4px}
+.pb{height:5px;background:var(--bd);border-radius:3px;overflow:hidden}.pf{height:100%;border-radius:3px;transition:width .8s ease}
+.st{width:100%;border-collapse:collapse}
+.st th{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;padding:0 0 9px;text-align:left;border-bottom:1px solid var(--bd)}
+.st td{padding:9px 0;font-size:13px;border-bottom:1px solid var(--bd);color:var(--tx2)}
+.st td:last-child{text-align:right;font-weight:600;font-family:'JetBrains Mono',monospace;font-size:12px}
+.st tr:last-child td{border-bottom:none}
+.bs{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.b80c{background:#FEF3EA;color:var(--sf)}.b80d{background:#EAF5EE;color:var(--gn)}.bhra{background:#EFF3FF;color:var(--in)}.bnps{background:#FFF8E8;color:var(--gld)}
+.clayout{display:grid;grid-template-columns:1fr 355px;gap:20px;align-items:start}
+.sec{background:#fff;border-radius:var(--r);border:1px solid var(--bd);padding:20px;margin-bottom:16px}
+.stitle{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.stitle::after{content:'';flex:1;height:1px;background:var(--bd)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:11px;font-weight:500;color:var(--tx3);letter-spacing:.05em;text-transform:uppercase}
+.fld input,.fld select{padding:9px 12px;border:1px solid var(--bd);border-radius:7px;font-size:13px;outline:none;transition:all .2s}
+.fld input:focus,.fld select:focus{border-color:var(--sf);box-shadow:0 0 0 2px rgba(232,104,26,.1)}
+.fld .pi2{position:relative}.fld .pi2::before{content:'Rs.';position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:11px;font-weight:600}
+.fld .pi2 input{padding-left:32px}
+.fhint{font-size:10px;color:var(--tx3);margin-top:2px}
+.div{height:1px;background:var(--bd);margin:14px 0}
+.rp{background:var(--nv2);border-radius:var(--r);color:#fff;padding:20px;position:sticky;top:80px}
+.rpt{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:16px;color:rgba(255,255,255,.9)}
+.tsr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.tsr:last-child{border-bottom:none}
+.tsr .l{font-size:12px;color:rgba(255,255,255,.48)}.tsr .v{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fff}
+.tsr .vg{color:#4ADE80}.tsr .vr{color:#FF8080}.tsr .vo{color:#FCD34D}
+.rptot{background:rgba(232,104,26,.14);border:1px solid rgba(232,104,26,.22);border-radius:9px;padding:14px;margin-top:12px}
+.rptot .rl{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:3px}
+.rptot .ra{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--sf2)}
+.rptot .rn{font-size:10px;color:rgba(255,255,255,.28);margin-top:3px}
+.rcomp{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.rbox{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:11px;text-align:center;cursor:pointer;transition:all .2s}
+.rbox:hover{background:rgba(255,255,255,.07)}.rbox.win{border-color:var(--gn2);background:rgba(14,163,85,.09)}
+.rbox .rbn{font-size:10px;color:rgba(255,255,255,.38);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em}
+.rbox .rbt{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#fff}
+.rbox .rbs{font-size:10px;color:var(--gn2);margin-top:3px}.rbox.win .rbn{color:var(--gn2)}
+.rec{margin-top:10px;padding:9px 12px;background:rgba(14,163,85,.13);border:1px solid rgba(14,163,85,.18);border-radius:7px;font-size:11px;color:#4ADE80;line-height:1.5}
+.cact{display:flex;gap:9px;margin-top:16px}
+.bcalc{flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.bc1{background:linear-gradient(135deg,var(--sf),var(--sf2));color:#fff}.bc1:hover{box-shadow:0 4px 14px rgba(232,104,26,.35);transform:translateY(-1px)}
+.bc2{background:var(--cr);border:1px solid var(--bd);color:var(--tx2)}
+.bc3{background:linear-gradient(135deg,var(--gn),var(--gn2));color:#fff}.bc3:hover{box-shadow:0 4px 14px rgba(14,122,61,.35)}
+.dlayout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dc{background:#fff;border-radius:var(--r);border:1px solid var(--bd);overflow:hidden}
+.dh{padding:13px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px}
+.dbdge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px}
+.dht{font-size:13px;font-weight:600}.dhl{font-size:11px;color:var(--tx3);margin-top:1px}
+.db{padding:16px}
+.dir{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)}
+.dir:last-child{border-bottom:none}.dil{font-size:12px;color:var(--tx2);flex:1;padding-right:8px}
+.dii{width:128px;padding:6px 9px;border:1px solid var(--bd);border-radius:6px;font-size:12px;text-align:right;font-family:'JetBrains Mono',monospace;outline:none;transition:all .2s}
+.dii:focus{border-color:var(--sf);box-shadow:0 0 0 2px rgba(232,104,26,.08)}
+.dtot{background:var(--cr);border-radius:7px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.dtot .tl{font-size:12px;font-weight:600}.dtot .tv{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--sf)}
+.cap{font-size:10px;padding:2px 7px;border-radius:4px;margin-left:5px}.cap-ok{background:#EAF5EE;color:var(--gn)}.cap-ov{background:#FEF3EA;color:var(--sf)}
+.htw{background:#fff;border-radius:var(--r);border:1px solid var(--bd);overflow:hidden}
+.ht{width:100%;border-collapse:collapse}
+.ht thead th{background:var(--nv2);color:rgba(255,255,255,.65);font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:12px 16px;text-align:left}
+.ht tbody td{padding:12px 16px;font-size:13px;color:var(--tx2);border-bottom:1px solid var(--bd)}
+.ht tbody tr:hover{background:var(--cr)}
+.sbdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:5px}
+.sf-i{background:#EAF5EE;color:var(--gn)}.sp-i{background:#FEF3EA;color:var(--sf)}.sd-i{background:#EFF3FF;color:var(--in)}
+.sdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.pgrid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.pcard{background:#fff;border-radius:var(--r);border:1px solid var(--bd);padding:22px}
+.pavs{display:flex;align-items:center;gap:18px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
+.pavlg{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--sf),var(--sf2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;font-family:'Playfair Display',serif}
+.pname{font-family:'Playfair Display',serif;font-size:20px;font-weight:700}
+.ppan2{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--tx3);margin-top:2px}
+.pstat{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:5px;background:#EAF5EE;color:var(--gn);margin-top:5px}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ifl label{font-size:10px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:4px}
+.ifl .iv{font-size:13px;font-weight:500}
+.thc{background:var(--nv2);border-radius:var(--r);padding:22px;color:#fff}
+.hsring{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;position:relative}
+.hsval{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#fff;position:relative;z-index:1}
+.hst{text-align:center;font-size:13px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:14px}
+.hi{display:flex;align-items:center;gap:9px;margin-bottom:9px;font-size:12px;color:rgba(255,255,255,.55)}
+.igr{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.ic{background:#fff;border:2px solid var(--bd);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;text-align:center}
+.ic:hover{border-color:var(--sf);box-shadow:0 4px 16px rgba(9,23,43,.09)}.ic.sel{border-color:var(--sf);background:var(--sfp)}
+.ic .ifm{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:5px}.ic.sel .ifm{color:var(--sf)}
+.ic .ifo{font-size:11px;color:var(--tx3);line-height:1.4}
+.notice{background:linear-gradient(135deg,rgba(232,104,26,.07),rgba(14,122,61,.05));border:1px solid var(--bd);border-left:4px solid var(--sf2);border-radius:var(--r);padding:13px 16px;margin-bottom:16px;font-size:12px;color:var(--tx2);line-height:1.6}
+.notice strong{color:var(--sf)}
+.mt6{margin-top:20px}.chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:16px;font-size:10px;font-weight:600}
+.csf{background:var(--sfp);color:var(--sf)}.cgn{background:var(--gnp);color:var(--gn)}.cgld{background:#FFF8E8;color:var(--gld)}
+.es{text-align:center;padding:36px 20px;color:var(--tx3)}.esi{font-size:40px;margin-bottom:10px;opacity:.35}.est{font-size:13px}
+.tc{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.tst{padding:10px 16px;border-radius:9px;font-size:13px;font-weight:500;box-shadow:0 8px 28px rgba(9,23,43,.2);animation:tin .25s ease;display:flex;align-items:center;gap:7px;min-width:240px}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.ts-s{background:#0E7A3D;color:#fff}.ts-e{background:#C0392B;color:#fff}.ts-i{background:var(--nv2);color:#fff}
+.lo{position:fixed;inset:0;background:rgba(9,23,43,.7);z-index:9998;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.lo.show{display:flex}.sp{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--sf2);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}.ltext{color:rgba(255,255,255,.55);font-size:13px}
+.mo{position:fixed;inset:0;background:rgba(9,23,43,.8);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.mo.show{display:flex}.mod{background:#fff;border-radius:18px;padding:26px;max-width:540px;width:100%;max-height:88vh;overflow-y:auto}
+.mod h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:7px}
+.mod p{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:12px}
+.mod pre{background:var(--nv2);color:#8BE09E;border-radius:9px;padding:14px;font-size:11px;overflow-x:auto;margin-bottom:12px;white-space:pre-wrap;line-height:1.6}
+.mod input{width:100%;padding:10px;border:1px solid var(--bd);border-radius:7px;font-size:13px;margin-bottom:9px;outline:none}
+.mod input:focus{border-color:var(--sf)}.mact{display:flex;gap:8px}
+.mb{flex:1;padding:10px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.mb1{background:linear-gradient(135deg,var(--sf),var(--sf2));color:#fff}.mb2{background:var(--cr);border:1px solid var(--bd);color:var(--tx2)}
+@media(max-width:1180px){.sgrid{grid-template-columns:repeat(2,1fr)}.clayout{grid-template-columns:1fr}.rp{position:static}}
+@media(max-width:880px){.sidebar{transform:translateX(-100%)}.mc{margin-left:0}.dlayout{grid-template-columns:1fr}.dgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="lo" id="loader"><div class="sp"></div><div class="ltext" id="ltxt">Please wait</div></div>
+<div class="tc" id="tc"></div>
+<!-- MODAL -->
+<div class="mo" id="setupModal">
+<div class="mod">
+<h2>Connect Google Sheets</h2>
+<p>To enable registration and tax data saving, deploy an Apps Script Web App from your Google Sheet.</p>
+<p><strong>Steps:</strong> Open Sheet &rarr; Extensions &rarr; Apps Script &rarr; Paste code below &rarr; Deploy as Web App (Execute as: Me, Access: Anyone) &rarr; Copy URL</p>
+<pre>const SS_ID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
+function doPost(e){
+  const d=JSON.parse(e.postData.contents);
+  const ss=SpreadsheetApp.openById(SS_ID);
+  if(d.action==='register'){
+    let s=ss.getSheetByName('Users');
+    if(!s){s=ss.insertSheet('Users');
+      s.appendRow(['FirstName','LastName','Email','Password',
+        'PAN','Mobile','DOB','AY','Status','RegisteredOn']);}
+    s.appendRow(d.row);
+  }else if(d.action==='save_tax'){
+    let s=ss.getSheetByName('TaxData');
+    if(!s){s=ss.insertSheet('TaxData');
+      s.appendRow(['Email','Name','PAN','FY','AY','GrossIncome',
+        'Deductions','TaxableIncome','OldTax','NewTax',
+        'TaxPayable','Regime','Status','SavedOn','Time']);}
+    s.appendRow(d.row);
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify({success:true}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+function doGet(){return ContentService.createTextOutput('Tax-Maga OK');}</pre>
+<p style="background:#FEF3EA;border-radius:7px;padding:9px 12px;font-size:11px;"><strong>Sheet Setup:</strong> Users tab headers: FirstName | LastName | Email | Password | PAN | Mobile | DOB | AY | <strong>Status</strong> | RegisteredOn<br>To approve a user: Change their Status from <strong>pending</strong> to <strong>approved</strong></p>
+<input type="url" id="murl" placeholder="https://script.google.com/macros/s/.../exec">
+<div class="mact">
+<button class="mb mb1" onclick="saveASU()">Save &amp; Continue</button>
+<button class="mb mb2" onclick="closeModal()">Skip for Now</button>
+</div>
+</div>
+</div>
+<!-- AUTH -->
+<div class="page active" id="page-auth">
+<div class="aw">
+<div class="alo">
+<div class="brand">Tax-<span class="s">Ma</span><span class="g">ga</span></div>
+<div class="tagline">India's Intelligent Tax Assistant</div>
+<div class="tribar"><span class="t1"></span><span class="t2"></span><span class="t3"></span></div>
+</div>
+<div class="acard">
+<div class="atabs">
+<button class="atab active" onclick="switchTab('login')">Sign In</button>
+<button class="atab" onclick="switchTab('register')">Register</button>
+</div>
+<div class="aform">
+<div class="apanel active" id="pl">
+<div class="fg"><label>Email</label><input type="email" id="le" placeholder="you@example.com"></div>
+<div class="fg"><label>Password</label><input type="password" id="lp" placeholder="min 8 characters" onkeydown="if(event.key==='Enter')login()"></div>
+<div id="lerr" class="emsg">Invalid credentials or account pending approval.</div>
+<button class="btn btn-p" onclick="login()" style="margin-top:6px">Sign In</button>
+<p class="amsg">Demo: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cfabaaa2a08fbbaeb7a2aea8aee1a6a1">[email&#160;protected]</a> / demo1234 &nbsp;|&nbsp; <a href="#" onclick="switchTab('register')" style="color:var(--sf2)">Register here</a></p>
+</div>
+<div class="apanel" id="pr">
+<div class="anote">After registering, an admin must change your Status from <strong>pending to approved</strong> in the Google Sheet before you can login.</div>
+<div class="fr">
+<div class="fg"><label>First Name</label><input type="text" id="rfn" placeholder="Raj"></div>
+<div class="fg"><label>Last Name</label><input type="text" id="rln" placeholder="Sharma"></div>
+</div>
+<div class="fg"><label>Email</label><input type="email" id="re" placeholder="raj@example.com"></div>
+<div class="fg"><label>Password (min 8 chars)</label><input type="password" id="rpw" placeholder="min 8 characters"></div>
+<div class="fr">
+<div class="fg"><label>PAN Number</label><input type="text" id="rpan" placeholder="ABCDE1234F" maxlength="10" oninput="this.value=this.value.toUpperCase()"></div>
+<div class="fg"><label>Mobile</label><input type="tel" id="rmob" placeholder="9XXXXXXXXX" maxlength="10"></div>
+</div>
+<div class="fr">
+<div class="fg"><label>Date of Birth</label><input type="date" id="rdob"></div>
+<div class="fg"><label>Assessment Year</label><select id="ray"><option>AY 2025-26</option><option>AY 2024-25</option></select></div>
+</div>
+<div id="rerr" class="emsg"></div><div id="rsuc" class="smsg"></div>
+<button class="btn btn-g" onclick="register()" style="margin-top:4px">Submit Registration</button>
+<p class="amsg">Already registered? <a href="#" onclick="switchTab('login')" style="color:var(--gn2)">Sign In</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- APP -->
+<div class="page" id="page-app">
+<nav class="sidebar">
+<div class="sl"><div class="brand">Tax-<span class="s">Ma</span><span class="g">ga</span></div><div class="sub">CA-Grade Tax Platform</div></div>
+<div class="su"><div class="uav" id="sav">R</div><div class="ui"><div class="uname" id="snam">User</div><div class="upan" id="span2">PAN: ----</div></div></div>
+<div class="snav">
+<div class="snl">Overview</div><div class="ni active" onclick="showP('dashboard')"><span class="ico">&#127968;</span> Dashboard</div>
+<div class="snl">Tax Tools</div>
+<div class="ni" onclick="showP('calculator')"><span class="ico">&#129518;</span> Tax Calculator</div>
+<div class="ni" onclick="showP('deductions')"><span class="ico">&#128176;</span> Deductions &amp; Savings</div>
+<div class="ni" onclick="showP('regimecompare')"><span class="ico">&#9878;</span> Regime Comparison</div>
+<div class="snl">Filing</div>
+<div class="ni" onclick="showP('itrguide')"><span class="ico">&#128203;</span> ITR Form Guide</div>
+<div class="ni" onclick="showP('history')"><span class="ico">&#128193;</span> Tax History</div>
+<div class="snl">Account</div>
+<div class="ni" onclick="showP('profile')"><span class="ico">&#128100;</span> My Profile</div>
+</div>
+<div class="sfooter"><div class="fyb"><span>AY 2025-26</span><span>FY 2024-25</span></div><button class="blo" onclick="logout()">Logout</button></div>
+</nav>
+<div class="mc">
+<div class="topbar">
+<div class="ttl" id="ttl">Dashboard</div>
+<div class="tact">
+<select class="fysel" onchange="CFY=this.value"><option value="2024-25">FY 2024-25 (AY 2025-26)</option><option value="2023-24">FY 2023-24 (AY 2024-25)</option></select>
+<div class="rgt"><button class="rb active" id="rbo" onclick="setR('old')">Old Regime</button><button class="rb" id="rbn" onclick="setR('new')">New Regime</button></div>
+</div>
+</div>
+<div class="ca">
+<!-- DASHBOARD -->
+<div class="panel active" id="panel-dashboard">
+<div class="notice"><strong>Budget 2025 Update:</strong> Under New Regime, income up to Rs.12 lakh is effectively tax-free (Rs.75K standard deduction + rebate u/s 87A). New Regime is now the default for salaried employees. Review your regime!</div>
+<div class="sgrid">
+<div class="sc sf"><div class="sico">Rs.</div><div class="slbl">Gross Income</div><div class="sval" id="di">Rs.0</div><div class="ssub">FY 2024-25</div></div>
+<div class="sc gn"><div class="sico">*</div><div class="slbl">Total Deductions</div><div class="sval" id="dd">Rs.0</div><div class="ssub">All sections</div></div>
+<div class="sc gld"><div class="sico">%</div><div class="slbl">Taxable Income</div><div class="sval" id="dt">Rs.0</div><div class="ssub">After deductions</div></div>
+<div class="sc in"><div class="sico">!</div><div class="slbl">Tax Liability</div><div class="sval" id="dx">Rs.0</div><div class="ssub" id="dr">Old Regime</div></div>
+</div>
+<div class="dgrid">
+<div class="card">
+<div class="ctitle"><span class="dot dsf"></span>Deduction Utilisation</div>
+<div class="pi"><div class="plab"><span>80C - Investments</span><span id="p80c">Rs.0 / Rs.1,50,000</span></div><div class="pb"><div class="pf" style="background:var(--sf2);width:0%" id="pb80c"></div></div></div>
+<div class="pi"><div class="plab"><span>80D - Health Insurance</span><span id="p80d">Rs.0 / Rs.25,000</span></div><div class="pb"><div class="pf" style="background:var(--gn2);width:0%" id="pb80d"></div></div></div>
+<div class="pi"><div class="plab"><span>HRA Exemption</span><span id="phra">Rs.0</span></div><div class="pb"><div class="pf" style="background:var(--gld);width:0%" id="pbhra"></div></div></div>
+<div class="pi"><div class="plab"><span>80CCD(1B) - NPS</span><span id="pnps">Rs.0 / Rs.50,000</span></div><div class="pb"><div class="pf" style="background:var(--in);width:0%" id="pbnps"></div></div></div>
+</div>
+<div class="card">
+<div class="ctitle"><span class="dot dgn"></span>Tax-Saving Opportunities</div>
+<table class="st"><thead><tr><th>Section</th><th>Description</th><th>Potential Saving</th></tr></thead><tbody id="stb"><tr><td colspan="3" style="text-align:center;color:var(--tx3);padding:18px;font-size:12px">Enter income in Tax Calculator to see opportunities</td></tr></tbody></table>
+</div>
+</div>
+<div class="dgrid mt6">
+<div class="card"><div class="ctitle"><span class="dot dgld"></span>Regime Recommendation</div><div id="drec" style="color:var(--tx3);font-size:13px;line-height:1.7">Calculate your taxes to get a personalised recommendation.</div></div>
+<div class="card">
+<div class="ctitle"><span class="dot din"></span>Key Tax Deadlines (FY 2024-25)</div>
+<table class="st"><thead><tr><th>Event</th><th>Due Date</th></tr></thead><tbody>
+<tr><td>ITR Filing (Non-Audit)</td><td>31 Jul 2025</td></tr>
+<tr><td>Advance Tax Q4</td><td>15 Mar 2025</td></tr>
+<tr><td>Form 16 from Employer</td><td>15 Jun 2025</td></tr>
+<tr><td>Investment Proofs Submission</td><td>31 Jan 2025</td></tr>
+<tr><td>Belated Return (Penalty applies)</td><td>31 Dec 2025</td></tr>
+</tbody></table>
+</div>
+</div>
+</div>
+<!-- CALCULATOR -->
+<div class="panel" id="panel-calculator">
+<div class="clayout">
+<div>
+<div class="sec">
+<div class="stitle">Income Details</div>
+<div class="cgrid">
+<div class="fld"><label>Basic Salary (Annual)</label><div class="pi2"><input type="number" id="ci1" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>HRA Received</label><div class="pi2"><input type="number" id="ci2" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>Special / Other Allowance</label><div class="pi2"><input type="number" id="ci3" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>LTA (Leave Travel)</label><div class="pi2"><input type="number" id="ci4" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>Bonus / Arrears</label><div class="pi2"><input type="number" id="ci5" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>Perquisites / Other Income</label><div class="pi2"><input type="number" id="ci6" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>Rental Income</label><div class="pi2"><input type="number" id="ci7" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>Interest Income (FD/Savings)</label><div class="pi2"><input type="number" id="ci8" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>STCG (Short-term Capital Gains)</label><div class="pi2"><input type="number" id="ci9" placeholder="0" oninput="calc()"></div></div>
+<div class="fld"><label>LTCG (Long-term Capital Gains)</label><div class="pi2"><input type="number" id="ci10" placeholder="0" oninput="calc()"></div></div>
+</div>
+</div>
+<div class="sec">
+<div class="stitle">HRA Exemption - Sec 10(13A)</div>
+<div class="cgrid">
+<div class="fld"><label>Annual Rent Paid</label><div class="pi2"><input type="number" id="crp" placeholder="0" oninput="calc()"></div><div class="fhint">Actual rent paid to landlord per year</div></div>
+<div class="fld"><label>City of Residence</label><select id="ccity" onchange="calc()"><option value="metro">Metro (Delhi/Mumbai/Kolkata/Chennai)</option><option value="non">Non-Metro City</option></select><div class="fhint">Metro = 50% basic, Non-Metro = 40%</div></div>
+</div>
+</div>
+<div class="sec">
+<div class="stitle">Deductions - Old Regime (Chapter VI-A)</div>
+<div class="cgrid">
+<div class="fld"><label>80C - Investments <span class="chip csf">Max Rs.1.5L</span></label><div class="pi2"><input type="number" id="cd1" placeholder="0" oninput="calc()"></div><div class="fhint">EPF, PPF, ELSS, LIC, NSC, HLP</div></div>
+<div class="fld"><label>80D - Health Insurance <span class="chip cgn">Max Rs.75K</span></label><div class="pi2"><input type="number" id="cd2" placeholder="0" oninput="calc()"></div><div class="fhint">Self Rs.25K + Parents Rs.25-50K</div></div>
+<div class="fld"><label>80CCD(1B) - NPS <span class="chip cgld">Max Rs.50K</span></label><div class="pi2"><input type="number" id="cd3" placeholder="0" oninput="calc()"></div><div class="fhint">Additional NPS contribution</div></div>
+<div class="fld"><label>Sec 24(b) - Home Loan Interest</label><div class="pi2"><input type="number" id="cd4" placeholder="0" oninput="calc()"></div><div class="fhint">Max Rs.2L for self-occupied</div></div>
+<div class="fld"><label>80E - Education Loan Interest</label><div class="pi2"><input type="number" id="cd5" placeholder="0" oninput="calc()"></div><div class="fhint">No limit, 8 years</div></div>
+<div class="fld"><label>80G - Donations</label><div class="pi2"><input type="number" id="cd6" placeholder="0" oninput="calc()"></div><div class="fhint">50%/100% qualifying donations</div></div>
+<div class="fld"><label>80TTA - Savings Interest</label><div class="pi2"><input type="number" id="cd7" placeholder="0" oninput="calc()"></div><div class="fhint">Max Rs.10,000</div></div>
+<div class="fld"><label>Other (80U, 80DD, 80GG)</label><div class="pi2"><input type="number" id="cd8" placeholder="0" oninput="calc()"></div></div>
+</div>
+</div>
+<div class="cact">
+<button class="bcalc bc1" onclick="calc()">Recalculate</button>
+<button class="bcalc bc3" onclick="saveSheet()">Save to Sheet</button>
+<button class="bcalc bc2" onclick="resetCalc()">Reset</button>
+</div>
+</div>
+<div class="rp">
+<div class="rpt">Live Tax Summary</div>
+<div class="tsr"><span class="l">Gross Total Income</span><span class="v" id="rg">Rs.0</span></div>
+<div class="tsr"><span class="l">Standard Deduction</span><span class="v vg" id="rs">-Rs.0</span></div>
+<div class="tsr"><span class="l">HRA Exemption</span><span class="v vg" id="rh">-Rs.0</span></div>
+<div class="tsr"><span class="l">Chapter VI-A Deductions</span><span class="v vg" id="rc6">-Rs.0</span></div>
+<div class="tsr"><span class="l">Home Loan Interest (24b)</span><span class="v vg" id="rhl">-Rs.0</span></div>
+<div class="tsr"><span class="l">Net Taxable Income</span><span class="v vo" id="rti">Rs.0</span></div>
+<div class="tsr"><span class="l">Income Tax</span><span class="v vr" id="rtx">Rs.0</span></div>
+<div class="tsr"><span class="l">Surcharge</span><span class="v vr" id="rsc">Rs.0</span></div>
+<div class="tsr"><span class="l">Cess (4%)</span><span class="v vr" id="rcs">Rs.0</span></div>
+<div class="tsr"><span class="l">Rebate u/s 87A</span><span class="v vg" id="rrb">Rs.0</span></div>
+<div class="rptot"><div class="rl">Total Tax Payable</div><div class="ra" id="rt">Rs.0</div><div class="rn" id="rrn">Under Old Regime</div></div>
+<div class="rcomp">
+<div class="rbox" id="rbold"><div class="rbn">Old Regime</div><div class="rbt" id="rcold">Rs.0</div><div class="rbs" id="rolds"></div></div>
+<div class="rbox" id="rbnew"><div class="rbn">New Regime</div><div class="rbt" id="rcnew">Rs.0</div><div class="rbs" id="rnews"></div></div>
+</div>
+<div class="rec" id="rrec" style="display:none"></div>
+</div>
+</div>
+</div>
+<!-- DEDUCTIONS -->
+<div class="panel" id="panel-deductions">
+<div class="notice"><strong>CA Tip:</strong> 80C alone saves Rs.46,800 at 30% slab. Add 80D + NPS + HRA + Home Loan for maximum tax efficiency under the Old Regime.</div>
+<div class="dlayout">
+<div class="dc">
+<div class="dh"><span class="dbdge b80c">80C</span><div><div class="dht">Investment Deductions</div><div class="dhl">Overall limit: Rs.1,50,000</div></div></div>
+<div class="db">
+<div class="dir"><span class="dil">EPF (Employee Provident Fund)</span><input class="dii" id="d1" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">PPF Investment</span><input class="dii" id="d2" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">ELSS / Tax-Saving Mutual Fund</span><input class="dii" id="d3" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">LIC Premium</span><input class="dii" id="d4" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">NSC / KVP</span><input class="dii" id="d5" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">Home Loan Principal Repaid</span><input class="dii" id="d6" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">SCSS / Sukanya Samriddhi (SSY)</span><input class="dii" id="d7" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">5-Year Bank / Post Office FD</span><input class="dii" id="d8" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">Children Tuition Fees (max 2)</span><input class="dii" id="d9" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dtot"><span class="tl">Total 80C <span class="cap cap-ok" id="cap80c">Rs.0</span></span><span class="tv" id="tot80c">Rs.0</span></div>
+</div>
+</div>
+<div class="dc">
+<div class="dh"><span class="dbdge b80d">80D</span><div><div class="dht">Health Insurance Premiums</div><div class="dhl">Self+Family Rs.25K | Parents Rs.25-50K</div></div></div>
+<div class="db">
+<div class="dir"><span class="dil">Self / Spouse / Children (below 60)</span><input class="dii" id="d10" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">Parents (below 60 years)</span><input class="dii" id="d11" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">Parents (Senior Citizen 60+)</span><input class="dii" id="d12" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">Preventive Health Checkup (max Rs.5K)</span><input class="dii" id="d13" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dtot"><span class="tl">Total 80D <span class="cap cap-ok" id="cap80d">Rs.0</span></span><span class="tv" id="tot80d">Rs.0</span></div>
+</div>
+</div>
+<div class="dc">
+<div class="dh"><span class="dbdge bnps">80CCD(1B)</span><div><div class="dht">National Pension System</div><div class="dhl">Additional deduction up to Rs.50,000</div></div></div>
+<div class="db">
+<div class="dir"><span class="dil">Tier I NPS Contribution (own)</span><input class="dii" id="d14" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">Employer NPS (80CCD(2) - allowed in New Regime)</span><input class="dii" id="d15" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">Atal Pension Yojana (APY)</span><input class="dii" id="d16" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dtot"><span class="tl">Total NPS <span class="cap cap-ok" id="capnps">Rs.0</span></span><span class="tv" id="totnps">Rs.0</span></div>
+</div>
+</div>
+<div class="dc">
+<div class="dh"><span class="dbdge bhra">Other Sections</span><div><div class="dht">Sec 24, 80E, 80G, 80TTA, 80U</div><div class="dhl">Home Loan, Education, Donations, Disability</div></div></div>
+<div class="db">
+<div class="dir"><span class="dil">Home Loan Interest Sec 24(b) (max Rs.2L)</span><input class="dii" id="d17" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">80E - Education Loan Interest</span><input class="dii" id="d18" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">80G - Qualifying Donations</span><input class="dii" id="d19" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">80TTA - Savings Account Interest (max Rs.10K)</span><input class="dii" id="d20" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">80U - Disability (self)</span><input class="dii" id="d21" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dir"><span class="dil">80DD - Disabled Dependent</span><input class="dii" id="d22" type="number" placeholder="0" oninput="updDed()"></div>
+<div class="dtot"><span class="tl">Total Others</span><span class="tv" id="tototh">Rs.0</span></div>
+</div>
+</div>
+</div>
+<div class="card mt6">
+<div class="ctitle"><span class="dot dgn"></span>Grand Summary &amp; Remaining Room</div>
+<table class="st"><thead><tr><th>Section</th><th>Description</th><th>Claimed</th><th>Max Limit</th><th>Room Left</th></tr></thead>
+<tbody>
+<tr><td><span class="bs b80c">80C</span></td><td>EPF, PPF, ELSS, LIC, NSC...</td><td id="s80c">Rs.0</td><td>Rs.1,50,000</td><td id="r80c" style="text-align:right;color:var(--gn)">Rs.1,50,000</td></tr>
+<tr><td><span class="bs b80d">80D</span></td><td>Health Insurance Premiums</td><td id="s80d">Rs.0</td><td>Rs.75,000</td><td id="r80d" style="text-align:right;color:var(--gn)">Rs.75,000</td></tr>
+<tr><td><span class="bs bnps">NPS</span></td><td>NPS Tier I (80CCD1B)</td><td id="snps">Rs.0</td><td>Rs.50,000</td><td id="rnps" style="text-align:right;color:var(--gn)">Rs.50,000</td></tr>
+<tr><td><span class="bs bhra">Others</span></td><td>Sec 24, 80E, 80G, 80TTA, 80U</td><td id="soth">Rs.0</td><td>-</td><td>-</td></tr>
+</tbody></table>
+</div>
+</div>
+<!-- REGIME COMPARE -->
+<div class="panel" id="panel-regimecompare">
+<div class="notice"><strong>Regime Choice:</strong> Old Regime rewards heavy investments. New Regime offers lower flat rates. Calculate both and pick what saves more tax!</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div class="card">
+<div class="ctitle" style="font-family:'Playfair Display',serif;font-size:18px;color:var(--sf)">Old Regime - Tax Slabs</div>
+<table class="st"><thead><tr><th>Income Slab</th><th>Tax Rate</th></tr></thead><tbody>
+<tr><td>Up to Rs.2.5 Lakh</td><td>NIL</td></tr><tr><td>Rs.2.5L - Rs.5L</td><td>5%</td></tr>
+<tr><td>Rs.5L - Rs.10L</td><td>20%</td></tr><tr><td>Above Rs.10L</td><td>30%</td></tr>
+</tbody></table>
+<div class="div"></div>
+<div style="font-size:12px;color:var(--tx2);line-height:2">HRA Exemption available | 80C up to Rs.1.5L | 80D Health Insurance<br>Home loan interest (24b) | LTA Exemption | Standard deduction Rs.50,000<br>Rebate 87A: for taxable income up to Rs.5L</div>
+</div>
+<div class="card">
+<div class="ctitle" style="font-family:'Playfair Display',serif;font-size:18px;color:var(--gn)">New Regime (Budget 2024)</div>
+<table class="st"><thead><tr><th>Income Slab</th><th>Tax Rate</th></tr></thead><tbody>
+<tr><td>Up to Rs.3 Lakh</td><td>NIL</td></tr><tr><td>Rs.3L - Rs.7L</td><td>5%</td></tr>
+<tr><td>Rs.7L - Rs.10L</td><td>10%</td></tr><tr><td>Rs.10L - Rs.12L</td><td>15%</td></tr>
+<tr><td>Rs.12L - Rs.15L</td><td>20%</td></tr><tr><td>Above Rs.15L</td><td>30%</td></tr>
+</tbody></table>
+<div class="div"></div>
+<div style="font-size:12px;color:var(--tx2);line-height:2">Standard deduction Rs.75,000 | 87A Rebate up to Rs.7L<br>Effectively Rs.12L tax-free | Employer NPS (80CCD2) allowed<br>NO HRA, 80C, 80D, Home Loan, LTA deductions</div>
+</div>
+</div>
+<div class="card mt6">
+<div class="ctitle"><span class="dot dsf"></span>Quick Regime Calculator</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+<div class="fld"><label>Gross Income</label><div class="pi2"><input type="number" id="rci" placeholder="0" oninput="quickCmp()"></div></div>
+<div class="fld"><label>Total Deductions (Old)</label><div class="pi2"><input type="number" id="rcd" placeholder="0" oninput="quickCmp()"></div></div>
+</div>
+<div id="rcr" style="display:none">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+<div style="background:var(--sfp);border:1px solid rgba(232,104,26,.18);border-radius:9px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--sf);font-weight:700;margin-bottom:3px">OLD REGIME</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--sf)" id="qco">Rs.0</div></div>
+<div style="background:var(--gnp);border:1px solid rgba(14,122,61,.18);border-radius:9px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--gn);font-weight:700;margin-bottom:3px">NEW REGIME</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--gn)" id="qcn">Rs.0</div></div>
+</div>
+<div id="qcv" style="padding:10px 14px;background:var(--cr);border-radius:7px;font-size:12px;color:var(--tx2);border-left:3px solid var(--sf2)"></div>
+</div>
+</div>
+</div>
+<!-- ITR GUIDE -->
+<div class="panel" id="panel-itrguide">
+<div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:20px">Which ITR Form Should You File?</div>
+<div class="igr">
+<div class="ic" onclick="selITR(this,'1')"><div class="ifm">ITR-1</div><div style="font-size:10px;font-weight:700;color:var(--sf);margin-bottom:5px">SAHAJ</div><div class="ifo">Salaried, income up to Rs.50L. One house property, basic interest income. Most common form.</div></div>
+<div class="ic" onclick="selITR(this,'2')"><div class="ifm">ITR-2</div><div style="font-size:10px;font-weight:700;color:var(--in);margin-bottom:5px">Individuals &amp; HUF</div><div class="ifo">Capital gains, multiple properties, foreign income, director/ESOP, income above Rs.50L.</div></div>
+<div class="ic" onclick="selITR(this,'3')"><div class="ifm">ITR-3</div><div style="font-size:10px;font-weight:700;color:var(--gn);margin-bottom:5px">Business &amp; Profession</div><div class="ifo">Income from business or profession. Also for partners in a firm. Detailed P&amp;L required.</div></div>
+<div class="ic" onclick="selITR(this,'4')"><div class="ifm">ITR-4</div><div style="font-size:10px;font-weight:700;color:var(--gld);margin-bottom:5px">SUGAM</div><div class="ifo">Presumptive taxation (44AD, 44ADA, 44AE). Business Rs.2Cr or profession Rs.50L.</div></div>
+<div class="ic" onclick="selITR(this,'5')"><div class="ifm">ITR-5</div><div style="font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:5px">Firms &amp; LLPs</div><div class="ifo">Partnership firms, LLPs, AOPs, BOIs. Not for companies or individuals.</div></div>
+<div class="ic" onclick="selITR(this,'6')"><div class="ifm">ITR-6</div><div style="font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:5px">Companies</div><div class="ifo">All companies (except Sec 11 exemption). E-filing with DSC mandatory.</div></div>
+</div>
+<div class="card" id="idc" style="display:none"><div class="ctitle" id="idt"></div><div id="idd" style="font-size:13px;color:var(--tx2);line-height:1.7"></div></div>
+<div class="card mt6">
+<div class="ctitle"><span class="dot dgld"></span>Filing Checklist</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+<div><div style="font-size:12px;font-weight:700;margin-bottom:9px">Always Required</div><div style="font-size:12px;color:var(--tx2);line-height:2.1">
+PAN Card and Aadhaar (linked)<br>Form 16 from Employer<br>Bank Statements (all accounts)<br>Form 26AS / AIS / TIS (Income Tax portal)<br>Investment proofs (80C instruments)<br>Health insurance premium receipts</div></div>
+<div><div style="font-size:12px;font-weight:700;margin-bottom:9px">If Applicable</div><div style="font-size:12px;color:var(--tx2);line-height:2.1">
+Home loan interest certificate<br>Capital gains statement (broker/CDSL)<br>Rent receipts + PAN of landlord<br>Donation receipts (80G)<br>Foreign income / asset details<br>NPS statement (NSDL portal)</div></div>
+</div>
+</div>
+</div>
+<!-- HISTORY -->
+<div class="panel" id="panel-history">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700">Tax Filing History</div>
+<button class="bcalc bc1" style="width:auto;padding:9px 18px" onclick="loadHist()">Refresh</button>
+</div>
+<div class="htw"><table class="ht">
+<thead><tr><th>Assessment Year</th><th>Gross Income</th><th>Taxable Income</th><th>Tax Payable</th><th>Regime</th><th>Status</th><th>Saved On</th></tr></thead>
+<tbody id="htb"><tr><td colspan="7"><div class="es"><div class="esi">*</div><div class="est">No records yet. Calculate and save your taxes!</div></div></td></tr></tbody>
+</table></div>
+</div>
+<!-- PROFILE -->
+<div class="panel" id="panel-profile">
+<div class="pgrid">
+<div class="pcard">
+<div class="pavs">
+<div class="pavlg" id="paval">R</div>
+<div>
+<div class="pname" id="pnam">User Name</div>
+<div class="ppan2" id="ppan2">PAN: ------</div>
+<div class="pstat">Account Approved</div>
+</div>
+</div>
+<div class="igrid">
+<div class="ifl"><label>Email</label><div class="iv" id="pem">-</div></div>
+<div class="ifl"><label>Mobile</label><div class="iv" id="pmob">-</div></div>
+<div class="ifl"><label>Date of Birth</label><div class="iv" id="pdob">-</div></div>
+<div class="ifl"><label>Assessment Year</label><div class="iv" id="pay">AY 2025-26</div></div>
+</div>
+<div class="div"></div>
+<button class="bcalc bc1" style="width:auto;padding:9px 18px" onclick="document.getElementById('setupModal').classList.add('show')">Configure Google Sheets</button>
+</div>
+<div class="thc">
+<div class="hsring" id="hring"><div class="hsval" id="hsval">-</div></div>
+<div class="hst">Tax Health Score</div>
+<div class="hi">Profile complete and verified</div>
+<div class="hi" id="h80c">80C not fully utilized</div>
+<div class="hi" id="h80d">Health insurance not added</div>
+<div class="hi" id="hnps">NPS not contributing</div>
+<div class="hi">File before 31 Jul 2025 to avoid penalty</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const SID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
+let ASU=localStorage.getItem('tm_asu')||'https://script.google.com/macros/s/AKfycbwpU-T18X-WWq6vu0g7XO68GL4iJ3njUnMsSl6ItmNTj9QT8X_JBsWKllDzuJ0VdPZ--Q/exec';
+let CU=null,CR='old',CFY='2024-25';
+let TR={old:0,ne:0,ti:0,gross:0,ded:0,hra:0,oR:null,nR:null};
+const fmt=v=>!v||isNaN(v)?'Rs.0':'Rs.'+Math.round(v).toLocaleString('en-IN');
+const n=id=>parseFloat(document.getElementById(id)?.value)||0;
+const el=id=>document.getElementById(id);
+const tx=(id,v)=>{const e=el(id);if(e)e.textContent=v};
+const sL=(m)=>{el('loader').classList.add('show');el('ltxt').textContent=m||'Processing'};
+const hL=()=>el('loader').classList.remove('show');
+function toast(m,t){const e=document.createElement('div');e.className='tst ts-'+(t||'i');e.textContent=m;el('tc').appendChild(e);setTimeout(()=>e.remove(),4500);}
+function saveASU(){const u=el('murl').value.trim();if(u){ASU=u;localStorage.setItem('tm_asu',u);toast('Apps Script URL saved!','s');}closeModal();}
+function closeModal(){el('setupModal').classList.remove('show');}
+function switchTab(t){
+  document.querySelectorAll('.atab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));
+  el('pl').classList.toggle('active',t==='login');el('pr').classList.toggle('active',t==='register');
+}
+async function rdSh(gid){
+  try{const r=await fetch('https://docs.google.com/spreadsheets/d/'+SID+'/export?format=csv&gid='+(gid||0));
+    if(!r.ok)return null;return parseCSV(await r.text());}catch{return null;}
+}
+function parseCSV(txt){
+  const lines=txt.trim().split('\n');if(lines.length<2)return[];
+  const hdr=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  return lines.slice(1).map(line=>{const v=parseLine(line),o={};hdr.forEach((h,i)=>o[h]=(v[i]||'').replace(/"/g,'').trim());return o;});
+}
+function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){if(l[i]==='"'){q=!q;continue;}if(l[i]===','&&!q){r.push(c);c='';continue;}c+=l[i];}r.push(c);return r;}
+async function wrSh(action,data){
+  if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return false;}
+  try{
+    const fd=new URLSearchParams();
+    fd.append('data',JSON.stringify({action,...data}));
+    const r=await fetch(ASU,{method:'POST',body:fd});
+    const j=await r.json();
+    return j.success;
+  }catch(e){
+    console.error('wrSh error:',e);
+    toast('Connection failed. Check Apps Script deployment.','e');
+    return false;
+  }
+}
+async function register(){
+  const fn=el('rfn').value.trim(),ln=el('rln').value.trim(),em=el('re').value.trim();
+  const pw=el('rpw').value,pan=el('rpan').value.trim().toUpperCase();
+  const mob=el('rmob').value.trim(),dob=el('rdob').value,ay=el('ray').value;
+  const ee=el('rerr'),se=el('rsuc');ee.style.display='none';se.style.display='none';
+  if(!fn||!ln||!em||!pw||!pan||!mob||!dob){ee.textContent='Please fill all required fields.';ee.style.display='block';return;}
+  if(!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)){ee.textContent='Invalid PAN format (e.g. ABCDE1234F)';ee.style.display='block';return;}
+  if(pw.length<8){ee.textContent='Password must be at least 8 characters.';ee.style.display='block';return;}
+  if(!/^[6-9]\d{9}$/.test(mob)){ee.textContent='Invalid 10-digit Indian mobile number.';ee.style.display='block';return;}
+  sL('Submitting registration');
+  const ok=await wrSh('register',{sheetId:SID,row:[fn,ln,em,pw,pan,mob,dob,ay,'pending',new Date().toLocaleDateString('en-IN')]});
+  hL();
+  if(ok){se.textContent='Registration submitted! Admin must change Status to approved in Google Sheet.';se.style.display='block';toast('Registration submitted!','s');}
+  else{se.textContent='Configure the Apps Script URL to save registrations to Google Sheet.';se.style.display='block';}
+}
+async function login(){
+  const em=el('le').value.trim(),pw=el('lp').value;
+  const ee=el('lerr');ee.style.display='none';
+  if(!em||!pw){ee.style.display='block';return;}
+  if(em==='demo@taxmaga.in'&&pw==='demo1234'){loginOK({FirstName:'Demo',LastName:'User',Email:em,PAN:'DEMO01234A',Mobile:'9999999999',DOB:'1990-01-01',AY:'AY 2025-26',Status:'approved'});return;}
+  sL('Verifying credentials');const users=await rdSh(0);hL();
+  if(!users){ee.textContent='Cannot reach Google Sheet. Use demo@taxmaga.in / demo1234 for demo.';ee.style.display='block';return;}
+  const u=users.find(x=>x.Email?.toLowerCase()===em.toLowerCase()&&x.Password===pw);
+  if(!u){ee.textContent='Invalid email or password.';ee.style.display='block';return;}
+  const st=(u.Status||'').toLowerCase().trim();
+  if(st==='pending'){ee.textContent='Account pending admin approval. Please wait.';ee.style.display='block';return;}
+  if(st!=='approved'){ee.textContent='Account not approved. Status: '+st;ee.style.display='block';return;}
+  loginOK(u);
+}
+function loginOK(u){
+  CU=u;sessionStorage.setItem('tm_u',JSON.stringify(u));
+  const nm=(u.FirstName||'')+' '+(u.LastName||''),ini=(u.FirstName||'U')[0].toUpperCase();
+  tx('snam',nm.trim());tx('span2','PAN: '+(u.PAN||'----'));el('sav').textContent=ini;
+  tx('pnam',nm.trim());el('paval').textContent=ini;
+  const pe=el('ppan2');if(pe)pe.textContent='PAN: '+(u.PAN||'------');
+  tx('pem',u.Email||'-');tx('pmob',u.Mobile||'-');tx('pdob',u.DOB||'-');tx('pay',u.AY||'AY 2025-26');
+  if(ASU)el('murl').value=ASU;
+  showPage('page-app');showP('dashboard');loadHist();
+  toast('Welcome back '+u.FirstName+'!','s');
+}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));el(id).classList.add('active');}
+const PT={dashboard:'Dashboard',calculator:'Tax Calculator',deductions:'Deductions and Savings',regimecompare:'Regime Comparison',itrguide:'ITR Form Guide',history:'Tax History',profile:'My Profile'};
+function showP(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el('panel-'+id)?.classList.add('active');
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(x=>{if(x.getAttribute('onclick')?.includes("'"+id+"'"))x.classList.add('active');});
+  tx('ttl',PT[id]||'');if(id==='history')loadHist();
+}
+function setR(r){CR=r;el('rbo').classList.toggle('active',r==='old');el('rbn').classList.toggle('active',r==='new');calc();}
+function logout(){CU=null;sessionStorage.removeItem('tm_u');showPage('page-auth');toast('Logged out.','i');}
+function cOld(ti){
+  let t=ti<=250000?0:ti<=500000?(ti-250000)*.05:ti<=1000000?12500+(ti-500000)*.2:112500+(ti-1000000)*.3;
+  const rb=ti<=500000?Math.min(t,12500):0;t-=rb;
+  const s=ti>50000000?t*.37:ti>20000000?t*.25:ti>10000000?t*.15:ti>5000000?t*.1:0;
+  const c=(t+s)*.04;return{tax:Math.max(0,t),rebate:rb,sur:s,cess:c,total:Math.max(0,t+s+c)};
+}
+function cNew(ti){
+  let t=ti<=300000?0:ti<=700000?(ti-300000)*.05:ti<=1000000?20000+(ti-700000)*.1:ti<=1200000?50000+(ti-1000000)*.15:ti<=1500000?80000+(ti-1200000)*.2:140000+(ti-1500000)*.3;
+  const rb=ti<=700000?Math.min(t,25000):0;t-=rb;
+  const s=ti>50000000?t*.25:ti>20000000?t*.25:ti>10000000?t*.15:ti>5000000?t*.1:0;
+  const c=(t+s)*.04;return{tax:Math.max(0,t),rebate:rb,sur:s,cess:c,total:Math.max(0,t+s+c)};
+}
+function cHRA(b,h,rp,metro){if(!rp||rp<=0)return 0;return Math.min(h,b*(metro?.5:.4),Math.max(0,rp-b*.1));}
+function calc(){
+  const b=n('ci1'),h=n('ci2'),sp=n('ci3'),lt=n('ci4'),bn=n('ci5'),ot=n('ci6');
+  const ri=n('ci7'),ii=n('ci8'),stcg=n('ci9'),ltcg=n('ci10');
+  const rp=n('crp'),met=el('ccity')?.value==='metro';
+  const d1=Math.min(n('cd1'),150000),d2=Math.min(n('cd2'),75000),d3=Math.min(n('cd3'),50000);
+  const d4=Math.min(n('cd4'),200000),d5=n('cd5'),d6=n('cd6'),d7=Math.min(n('cd7'),10000),d8=n('cd8');
+  const gs=b+h+sp+lt+bn;const gross=gs+ot+ri+ii+stcg+ltcg;
+  const hraEx=cHRA(b,h,rp,met);
+  const stdO=Math.min(50000,gs),stdN=Math.min(75000,gs);
+  const ch6=d1+d2+d3+d5+d6+d7+d8;
+  const tiO=Math.max(0,gross-stdO-hraEx-ch6-d4),tiN=Math.max(0,gross-stdN);
+  const oR=cOld(tiO),nR=cNew(tiN);
+  const aR=CR==='old'?oR:nR,aTI=CR==='old'?tiO:tiN;
+  TR={gross,ded:ch6+hraEx+d4+(CR==='old'?stdO:stdN),ti:aTI,old:oR.total,ne:nR.total,hra:hraEx,ch6,d4,stdO,stdN,oR,nR};
+  tx('rg',fmt(gross));tx('rs','-'+fmt(CR==='old'?stdO:stdN));tx('rh','-'+fmt(hraEx));
+  tx('rc6',CR==='old'?'-'+fmt(ch6):'N/A');tx('rhl',CR==='old'?'-'+fmt(d4):'N/A');
+  tx('rti',fmt(aTI));tx('rtx',fmt(aR.tax));tx('rsc',fmt(aR.sur));tx('rcs',fmt(aR.cess));
+  tx('rrb','-'+fmt(aR.rebate));tx('rt',fmt(aR.total));tx('rrn',CR==='old'?'Under Old Regime':'Under New Regime');
+  const win=oR.total<=nR.total?'old':'new',diff=Math.abs(oR.total-nR.total);
+  el('rbold').classList.toggle('win',win==='old');el('rbnew').classList.toggle('win',win==='new');
+  tx('rcold',fmt(oR.total));tx('rcnew',fmt(nR.total));
+  tx('rolds',win==='old'?'Saves '+fmt(diff):'');tx('rnews',win==='new'?'Saves '+fmt(diff):'');
+  const re=el('rrec');
+  if(gross>0){re.style.display='block';re.textContent=win==='old'?'Old Regime saves '+fmt(diff)+' - your deductions are working hard!':'New Regime saves '+fmt(diff)+' - simpler and cheaper for your income!';}
+  updDash(gross,TR.ded,aTI,aR.total,d1,d2,hraEx,d3);updHealth(d1,d2,d3);
+}
+function updDash(g,d,ti,tx2,d1,d2,hra,nps){
+  tx('di',fmt(g));tx('dd',fmt(d));tx('dt',fmt(ti));tx('dx',fmt(tx2));tx('dr',CR==='old'?'Old Regime':'New Regime');
+  el('pb80c').style.width=Math.min(100,(d1/150000)*100)+'%';
+  el('pb80d').style.width=Math.min(100,(d2/25000)*100)+'%';
+  el('pbhra').style.width=Math.min(100,(hra/(g*.4+1))*100)+'%';
+  el('pbnps').style.width=Math.min(100,(nps/50000)*100)+'%';
+  tx('p80c',fmt(d1)+' / Rs.1,50,000');tx('p80d',fmt(d2)+' / Rs.25,000');tx('phra',fmt(hra));tx('pnps',fmt(nps)+' / Rs.50,000');
+  if(g>0){
+    const op=[
+      {s:'80C',desc:'Fill remaining 80C room',p:Math.max(0,150000-d1)*.30,b:'b80c'},
+      {s:'80D',desc:'Add health insurance',p:Math.max(0,25000-d2)*.30,b:'b80d'},
+      {s:'NPS',desc:'Extra NPS contribution',p:Math.max(0,50000-nps)*.30,b:'bnps'},
+    ].filter(x=>x.p>0);
+    const tb=el('stb');
+    tb.innerHTML=op.length?op.map(o=>'<tr><td><span class="bs '+o.b+'">'+o.s+'</span></td><td>'+o.desc+'</td><td style="color:var(--gn)">'+fmt(o.p)+'</td></tr>').join(''):'<tr><td colspan="3" style="text-align:center;color:var(--gn);padding:14px;font-size:12px">Major deductions fully utilized!</td></tr>';
+    const win=TR.old<=TR.ne?'old':'new',diff=Math.abs(TR.old-TR.ne);
+    el('drec').innerHTML='<div style="display:flex;gap:14px;align-items:flex-start"><div style="font-size:34px">'+(win==='new'?'N':'O')+'</div><div><div style="font-size:14px;font-weight:700;margin-bottom:5px">'+(win==='old'?'Old Regime Recommended':'New Regime Recommended')+'</div><div style="font-size:12px;color:var(--tx2)">You save <strong style="color:'+(win==='old'?'var(--sf)':'var(--gn)')+'">'+fmt(diff)+'</strong> under <strong>'+(win==='old'?'Old':'New')+' Regime</strong>. '+(win==='old'?'Your deductions make Old Regime beneficial.':'Lower flat rates save more for your income level.')+'</div></div></div>';
+  }
+}
+function updDed(){
+  const s80c=n('d1')+n('d2')+n('d3')+n('d4')+n('d5')+n('d6')+n('d7')+n('d8')+n('d9');
+  const c80c=Math.min(s80c,150000);
+  tx('tot80c',fmt(c80c));tx('s80c',fmt(c80c));tx('r80c',fmt(Math.max(0,150000-c80c)));
+  el('cap80c').textContent=s80c>150000?'Capped Rs.1.5L':fmt(s80c);el('cap80c').className='cap '+(s80c>150000?'cap-ov':'cap-ok');
+  const s80d=Math.min(n('d10'),25000)+Math.min(n('d11'),25000)+Math.min(n('d12'),50000)+Math.min(n('d13'),5000);
+  const c80d=Math.min(s80d,75000);
+  tx('tot80d',fmt(c80d));tx('s80d',fmt(c80d));tx('r80d',fmt(Math.max(0,75000-c80d)));
+  el('cap80d').textContent=fmt(c80d);el('cap80d').className='cap cap-ok';
+  const snps=Math.min(n('d14')+n('d16'),50000);
+  tx('totnps',fmt(snps));tx('snps',fmt(snps));tx('rnps',fmt(Math.max(0,50000-snps)));
+  el('capnps').textContent=fmt(snps);el('capnps').className='cap cap-ok';
+  const soth=Math.min(n('d17'),200000)+n('d18')+n('d19')+Math.min(n('d20'),10000)+n('d21')+n('d22');
+  tx('tototh',fmt(soth));tx('soth',fmt(soth));
+}
+function quickCmp(){
+  const inc=n('rci'),ded=n('rcd');if(!inc){el('rcr').style.display='none';return;}
+  const tiO=Math.max(0,inc-50000-Math.min(ded,300000)),tiN=Math.max(0,inc-75000);
+  const oR=cOld(tiO),nR=cNew(tiN);
+  el('rcr').style.display='block';tx('qco',fmt(oR.total));tx('qcn',fmt(nR.total));
+  const win=oR.total<=nR.total?'old':'new',diff=Math.abs(oR.total-nR.total);
+  el('qcv').innerHTML=win==='old'?'<strong>Old Regime</strong> is better - saves <strong>'+fmt(diff)+'</strong>. Your deductions make it worthwhile.':'<strong>New Regime</strong> is better - saves <strong>'+fmt(diff)+'</strong>. Lower flat rates win for this income.';
+}
+const itrD={
+  '1':{t:'ITR-1 (Sahaj) - Detailed Guide',c:'<strong>Who can file:</strong> Resident individual with total income up to Rs.50 lakh from salary/pension, one house property, and other sources (interest, dividends up to Rs.5000).<br><br><strong>Who cannot file:</strong> Director in a company, ESOP holder, agricultural income above Rs.5000, foreign income/assets, or foreign bank account signatory.<br><br><strong>Most popular form</strong> for salaried employees. Pre-filled returns available on incometax.gov.in using AIS/Form 26AS data.'},
+  '2':{t:'ITR-2 - Individuals and HUF',c:'<strong>Who should file:</strong> Capital gains (stocks, MF, property), multiple house properties, foreign income/assets, income above Rs.50L, director/ESOP holder.<br><br><strong>Key:</strong> Mandatory for anyone with capital gains. Schedule CG must be filled carefully with scrip-wise details from your broker statement.'},
+  '3':{t:'ITR-3 - Business and Profession',c:'<strong>Who should file:</strong> Income from business or profession, or as a partner in a firm. Includes all types covered under ITR-2.<br><br><strong>Requirements:</strong> Balance sheet, P&L statement. Tax audit mandatory if turnover exceeds Rs.1 crore (business) or Rs.50L (profession).'},
+  '4':{t:'ITR-4 (Sugam) - Presumptive Taxation',c:'<strong>Who should file:</strong> Resident individuals/HUF/firms opting for presumptive scheme - Sec 44AD (business, turnover up to Rs.2Cr, declare 8%/6% profit), 44ADA (professionals, receipts up to Rs.50L, declare 50% profit), or 44AE (goods carriages).<br><br><strong>Key benefit:</strong> No detailed books of accounts required.'},
+  '5':{t:'ITR-5 - Firms and LLPs',c:'<strong>Who should file:</strong> Partnership firms, LLPs, AOPs, BOIs, Artificial Juridical Persons. Not for companies or individuals.<br><br>Firm income taxed at 30%. Partners separately pay tax on their profit share (exempt in their hands under Sec 10(2A)).'},
+  '6':{t:'ITR-6 - Companies',c:'<strong>Who should file:</strong> All domestic/foreign companies except those claiming Sec 11 exemption.<br><br><strong>Requirements:</strong> Audited financials, MAT computation. Mandatory e-filing with Digital Signature Certificate (DSC).'}
+};
+function selITR(elem,num){document.querySelectorAll('.ic').forEach(c=>c.classList.remove('sel'));elem.classList.add('sel');const d=itrD[num];el('idc').style.display='block';tx('idt',d.t);el('idd').innerHTML=d.c;}
+async function saveSheet(){
+  if(!CU){toast('Please login first.','e');return;}
+  if(!TR.gross){toast('Enter income details first.','e');return;}
+  sL('Saving to Google Sheets');
+  const ok=await wrSh('save_tax',{sheetId:SID,row:[CU.Email,(CU.FirstName||'')+' '+(CU.LastName||''),CU.PAN||'',CFY,'AY '+(parseInt(CFY.split('-')[0])+1)+'-'+CFY.split('-')[1],Math.round(TR.gross),Math.round(TR.ded),Math.round(TR.ti),Math.round(TR.oR?.total||0),Math.round(TR.nR?.total||0),Math.round(CR==='old'?TR.old:TR.ne),CR.toUpperCase(),'Saved',new Date().toLocaleDateString('en-IN'),new Date().toLocaleTimeString('en-IN')]});
+  hL();if(ok){toast('Tax data saved to Google Sheets!','s');loadHist();}
+}
+async function loadHist(){
+  if(!CU)return;const tb=el('htb');
+  tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--tx3);font-size:12px">Loading...</td></tr>';
+  const rows=await rdSh(1)||await rdSh(0);
+  if(!rows||!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="es"><div class="est">No records yet.</div></div></td></tr>';return;}
+  const ur=rows.filter(r=>r.Email?.toLowerCase()===CU?.Email?.toLowerCase()&&r.GrossIncome);
+  if(!ur.length){tb.innerHTML='<tr><td colspan="7"><div class="es"><div class="est">No tax records yet. Save a calculation!</div></div></td></tr>';return;}
+  tb.innerHTML=ur.reverse().map(r=>'<tr><td><strong>'+(r.AY||r['Assessment Year']||'-')+'</strong></td><td style="font-family:monospace">'+fmt(parseFloat(r.GrossIncome||0))+'</td><td style="font-family:monospace">'+fmt(parseFloat(r.TaxableIncome||0))+'</td><td style="font-family:monospace;font-weight:700;color:var(--sf)">'+fmt(parseFloat(r.TaxPayable||0))+'</td><td><span class="chip '+(r.Regime==='NEW'?'cgn':'csf')+'">'+r.Regime+'</span></td><td><span class="sbdg '+(r.Status==='Filed'?'sf-i':'sp-i')+'"><span class="sdot"></span>'+(r.Status||'Saved')+'</span></td><td style="font-size:11px;color:var(--tx3)">'+(r.SavedOn||'-')+'</td></tr>').join('');
+}
+function resetCalc(){['ci1','ci2','ci3','ci4','ci5','ci6','ci7','ci8','ci9','ci10','crp','cd1','cd2','cd3','cd4','cd5','cd6','cd7','cd8'].forEach(id=>{const e=el(id);if(e)e.value='';});calc();toast('Calculator reset.','i');}
+function updHealth(d1,d2,nps){
+  const s=55+(d1>0?15:0)+(d2>0?10:0)+(nps>0?10:0)+(CU?10:0);
+  el('hsval').textContent=s;
+  el('hring').style.background='conic-gradient(var(--gn2) 0% '+s+'%,rgba(255,255,255,.08) '+s+'% 100%)';
+  el('h80c').textContent=d1>=150000?'80C fully utilized!':'80C not fully utilized';
+  el('h80d').textContent=d2>0?'Health insurance added':'Health insurance not added';
+  'NPS contribution active':'NPS not contributing';
+}
+window.onload=()=>{
+  const sv=sessionStorage.getItem('tm_u');
+  if(sv){try{loginOK(JSON.parse(sv));}catch(e){}}
+  if(ASU)el('murl').value=ASU;
+  calc();updDed();
+};
+</script>
+</body>
+</html>
