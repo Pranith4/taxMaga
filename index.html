@@ -199,28 +199,52 @@ input,select,button{font-family:'DM Sans',sans-serif}
 <p>To enable registration and tax data saving, deploy an Apps Script Web App from your Google Sheet.</p>
 <p><strong>Steps:</strong> Open Sheet &rarr; Extensions &rarr; Apps Script &rarr; Paste code below &rarr; Deploy as Web App (Execute as: Me, Access: Anyone) &rarr; Copy URL</p>
 <pre>const SS_ID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
+
 function doPost(e){
-  const d=JSON.parse(e.parameter.data);
-  const ss=SpreadsheetApp.openById(SS_ID);
-  if(d.action==='register'){
-    let s=ss.getSheetByName('Users');
-    if(!s){s=ss.insertSheet('Users');
-      s.appendRow(['FirstName','LastName','Email','Password',
-        'PAN','Mobile','DOB','AY','Status','RegisteredOn']);}
-    s.appendRow(d.row);
-  }else if(d.action==='save_tax'){
-    let s=ss.getSheetByName('TaxData');
-    if(!s){s=ss.insertSheet('TaxData');
-      s.appendRow(['Email','Name','PAN','FY','AY','GrossIncome',
-        'Deductions','TaxableIncome','OldTax','NewTax',
-        'TaxPayable','Regime','Status','SavedOn','Time']);}
-    s.appendRow(d.row);
+  try{
+    const d=JSON.parse(e.parameter.data);
+    const ss=SpreadsheetApp.openById(SS_ID);
+
+    if(d.action==='register'){
+      let s=ss.getSheetByName('Users');
+      if(!s){
+        s=ss.insertSheet('Users');
+        s.appendRow(['FirstName','LastName','Email','Password',
+          'PAN','Mobile','DOB','AY','Status','RegisteredOn']);
+      }
+      s.appendRow(d.row);
+
+    }else if(d.action==='save_tax'){
+      let s=ss.getSheetByName('TaxData');
+      if(!s){
+        s=ss.insertSheet('TaxData');
+        s.appendRow(['Email','Name','PAN','FY','AY','GrossIncome',
+          'Deductions','TaxableIncome','OldTax','NewTax',
+          'TaxPayable','Regime','Status','SavedOn','Time']);
+      }
+      s.appendRow(d.row);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({success:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  }catch(err){
+    return ContentService
+      .createTextOutput(JSON.stringify({success:false,error:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e){
+  // Also handle GET requests as fallback (for testing)
+  if(e && e.parameter && e.parameter.data){
+    return doPost(e);
   }
   return ContentService
-    .createTextOutput(JSON.stringify({success:true}))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-function doGet(){return ContentService.createTextOutput('Tax-Maga OK');}</pre>
+    .createTextOutput('Tax-Maga Apps Script OK')
+    .setMimeType(ContentService.MimeType.TEXT);
+}</pre>
 <p style="background:#FEF3EA;border-radius:7px;padding:9px 12px;font-size:11px;"><strong>Sheet Setup:</strong> Users tab headers: FirstName | LastName | Email | Password | PAN | Mobile | DOB | AY | <strong>Status</strong> | RegisteredOn<br>To approve a user: Change their Status from <strong>pending</strong> to <strong>approved</strong></p>
 <input type="url" id="murl" placeholder="https://script.google.com/macros/s/.../exec">
 <div class="mact">
@@ -602,28 +626,39 @@ function parseCSV(txt){
   return lines.slice(1).map(line=>{const v=parseLine(line),o={};hdr.forEach((h,i)=>o[h]=(v[i]||'').replace(/"/g,'').trim());return o;});
 }
 function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){if(l[i]==='"'){q=!q;continue;}if(l[i]===','&&!q){r.push(c);c='';continue;}c+=l[i];}r.push(c);return r;}
-async function wrSh(action,data){
-  if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return false;}
+function wrSh(action,data){
+  if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return Promise.resolve(false);}
   return new Promise((resolve)=>{
-    try{
-      // Use no-cors fetch — Apps Script accepts form POSTs cross-origin
-      const fd=new FormData();
-      fd.append('data',JSON.stringify({action,...data}));
-      fetch(ASU,{method:'POST',body:fd,mode:'no-cors'})
-        .then(()=>{
-          // no-cors returns opaque response, assume success if no network error
-          resolve(true);
-        })
-        .catch(e=>{
-          console.error('wrSh error:',e);
-          toast('Network error. Check your internet connection.','e');
-          resolve(false);
-        });
-    }catch(e){
-      console.error('wrSh error:',e);
-      toast('Failed to connect to Google Sheets.','e');
-      resolve(false);
-    }
+    // Hidden iframe form POST — only reliable cross-origin method for Apps Script
+    const ifrId='_gsIframe_'+Date.now();
+    const ifr=document.createElement('iframe');
+    ifr.name=ifrId;ifr.style.display='none';
+    document.body.appendChild(ifr);
+
+    const frm=document.createElement('form');
+    frm.method='POST';
+    frm.action=ASU;
+    frm.target=ifrId;
+    frm.style.display='none';
+
+    const inp=document.createElement('input');
+    inp.type='hidden';inp.name='data';
+    inp.value=JSON.stringify({action,...data});
+    frm.appendChild(inp);
+    document.body.appendChild(frm);
+
+    // Resolve true after submit (can't read response due to cross-origin)
+    ifr.onload=()=>{
+      setTimeout(()=>{
+        ifr.remove();frm.remove();
+      },1000);
+      resolve(true);
+    };
+
+    // Timeout fallback
+    setTimeout(()=>{ifr.remove();frm.remove();resolve(true);},6000);
+
+    frm.submit();
   });
 }
 async function register(){
@@ -798,7 +833,7 @@ function updHealth(d1,d2,nps){
   el('hring').style.background='conic-gradient(var(--gn2) 0% '+s+'%,rgba(255,255,255,.08) '+s+'% 100%)';
   el('h80c').textContent=d1>=150000?'80C fully utilized!':'80C not fully utilized';
   el('h80d').textContent=d2>0?'Health insurance added':'Health insurance not added';
-  el('h80n').textContent=nps>0?'NPS contribution active':'NPS not contributing';
+  'NPS contribution active':'NPS not contributing';
 }
 window.onload=()=>{
   const sv=sessionStorage.getItem('tm_u');
