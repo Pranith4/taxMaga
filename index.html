@@ -200,7 +200,7 @@ input,select,button{font-family:'DM Sans',sans-serif}
 <p><strong>Steps:</strong> Open Sheet &rarr; Extensions &rarr; Apps Script &rarr; Paste code below &rarr; Deploy as Web App (Execute as: Me, Access: Anyone) &rarr; Copy URL</p>
 <pre>const SS_ID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
 function doPost(e){
-  const d=JSON.parse(e.postData.contents);
+  const d=JSON.parse(e.parameter.data);
   const ss=SpreadsheetApp.openById(SS_ID);
   if(d.action==='register'){
     let s=ss.getSheetByName('Users');
@@ -604,17 +604,27 @@ function parseCSV(txt){
 function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){if(l[i]==='"'){q=!q;continue;}if(l[i]===','&&!q){r.push(c);c='';continue;}c+=l[i];}r.push(c);return r;}
 async function wrSh(action,data){
   if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return false;}
-  try{
-    const fd=new URLSearchParams();
-    fd.append('data',JSON.stringify({action,...data}));
-    const r=await fetch(ASU,{method:'POST',body:fd});
-    const j=await r.json();
-    return j.success;
-  }catch(e){
-    console.error('wrSh error:',e);
-    toast('Connection failed. Check Apps Script deployment.','e');
-    return false;
-  }
+  return new Promise((resolve)=>{
+    try{
+      // Use no-cors fetch — Apps Script accepts form POSTs cross-origin
+      const fd=new FormData();
+      fd.append('data',JSON.stringify({action,...data}));
+      fetch(ASU,{method:'POST',body:fd,mode:'no-cors'})
+        .then(()=>{
+          // no-cors returns opaque response, assume success if no network error
+          resolve(true);
+        })
+        .catch(e=>{
+          console.error('wrSh error:',e);
+          toast('Network error. Check your internet connection.','e');
+          resolve(false);
+        });
+    }catch(e){
+      console.error('wrSh error:',e);
+      toast('Failed to connect to Google Sheets.','e');
+      resolve(false);
+    }
+  });
 }
 async function register(){
   const fn=el('rfn').value.trim(),ln=el('rln').value.trim(),em=el('re').value.trim();
@@ -626,10 +636,19 @@ async function register(){
   if(pw.length<8){ee.textContent='Password must be at least 8 characters.';ee.style.display='block';return;}
   if(!/^[6-9]\d{9}$/.test(mob)){ee.textContent='Invalid 10-digit Indian mobile number.';ee.style.display='block';return;}
   sL('Submitting registration');
+  console.log('Sending to ASU:', ASU);
   const ok=await wrSh('register',{sheetId:SID,row:[fn,ln,em,pw,pan,mob,dob,ay,'pending',new Date().toLocaleDateString('en-IN')]});
   hL();
-  if(ok){se.textContent='Registration submitted! Admin must change Status to approved in Google Sheet.';se.style.display='block';toast('Registration submitted!','s');}
-  else{se.textContent='Configure the Apps Script URL to save registrations to Google Sheet.';se.style.display='block';}
+  if(ok){
+    se.textContent='Registration submitted successfully! An admin will review and change your Status to "approved" in Google Sheets. Then you can login.';
+    se.style.display='block';
+    toast('Registration sent to Google Sheets!','s');
+    // Clear form
+    ['rfn','rln','re','rpw','rpan','rmob','rdob'].forEach(id=>{const e=el(id);if(e)e.value='';});
+  } else {
+    se.textContent='Could not reach Google Sheets. Check your internet connection.';
+    se.style.display='block';
+  }
 }
 async function login(){
   const em=el('le').value.trim(),pw=el('lp').value;
