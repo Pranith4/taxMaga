@@ -248,7 +248,7 @@ function doGet(){return ContentService.createTextOutput('Tax-Maga OK');}</pre>
 <div class="fg"><label>Password</label><input type="password" id="lp" placeholder="min 8 characters" onkeydown="if(event.key==='Enter')login()"></div>
 <div id="lerr" class="emsg">Invalid credentials or account pending approval.</div>
 <button class="btn btn-p" onclick="login()" style="margin-top:6px">Sign In</button>
-<p class="amsg">Demo: demo@taxmaga.in / demo1234 &nbsp;|&nbsp; <a href="#" onclick="switchTab('register')" style="color:var(--sf2)">Register here</a></p>
+<p class="amsg">Demo: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cfabaaa2a08fbbaeb7a2aea8aee1a6a1">[email&#160;protected]</a> / demo1234 &nbsp;|&nbsp; <a href="#" onclick="switchTab('register')" style="color:var(--sf2)">Register here</a></p>
 </div>
 <div class="apanel" id="pr">
 <div class="anote">After registering, an admin must change your Status from <strong>pending to approved</strong> in the Google Sheet before you can login.</div>
@@ -574,9 +574,9 @@ Home loan interest certificate<br>Capital gains statement (broker/CDSL)<br>Rent 
 </div>
 </div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
-let ASU = "https://script.google.com/macros/s/AKfycbygyoQdLG-glML_gcEEZ3l9d4WIjYwj0FkiHfyGyjyJ50ZhGVX6K5M1TVvzndudfbaBnA/exec";
+let ASU=localStorage.getItem('tm_asu')||'https://script.google.com/macros/s/AKfycbwpU-T18X-WWq6vu0g7XO68GL4iJ3njUnMsSl6ItmNTj9QT8X_JBsWKllDzuJ0VdPZ--Q/exec';
 let CU=null,CR='old',CFY='2024-25';
 let TR={old:0,ne:0,ti:0,gross:0,ded:0,hra:0,oR:null,nR:null};
 const fmt=v=>!v||isNaN(v)?'Rs.0':'Rs.'+Math.round(v).toLocaleString('en-IN');
@@ -603,18 +603,15 @@ function parseCSV(txt){
 }
 function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){if(l[i]==='"'){q=!q;continue;}if(l[i]===','&&!q){r.push(c);c='';continue;}c+=l[i];}r.push(c);return r;}
 async function wrSh(action,data){
+  if(!ASU){el('murl').value='';el('setupModal').classList.add('show');return false;}
   try{
-    const r = await fetch(ASU,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action,...data})
-    });
-
-    const j = await r.json();
+    const fd=new URLSearchParams();
+    fd.append('data',JSON.stringify({action,...data}));
+    const r=await fetch(ASU,{method:'POST',body:fd});
+    const j=await r.json();
     return j.success;
-
   }catch(e){
-    console.error(e);
+    console.error('wrSh error:',e);
     toast('Connection failed. Check Apps Script deployment.','e');
     return false;
   }
@@ -782,7 +779,7 @@ function updHealth(d1,d2,nps){
   el('hring').style.background='conic-gradient(var(--gn2) 0% '+s+'%,rgba(255,255,255,.08) '+s+'% 100%)';
   el('h80c').textContent=d1>=150000?'80C fully utilized!':'80C not fully utilized';
   el('h80d').textContent=d2>0?'Health insurance added':'Health insurance not added';
-  el('hnps').textContent=nps>0?'NPS contribution active':'NPS not contributing';
+  'NPS contribution active':'NPS not contributing';
 }
 window.onload=()=>{
   const sv=sessionStorage.getItem('tm_u');
