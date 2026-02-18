@@ -597,7 +597,7 @@ Home loan interest certificate<br>Capital gains statement (broker/CDSL)<br>Rent 
 </div>
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SID='1FmbXdOvNRh3pSeBRXN-N-htetlCp6T8IUPakke2CQK8';
-let ASU=localStorage.getItem('tm_asu')||'https://script.google.com/macros/s/AKfycbxKv9V5GiN1tX7RwGymE1LpuwWb3wMSzbOAo2vWPnPobMmpvpsrJVCddutIKCcX3a62ig/exec';
+let ASU=localStorage.getItem('tm_asu')||'https://script.google.com/macros/s/AKfycbwpU-T18X-WWq6vu0g7XO68GL4iJ3njUnMsSl6ItmNTj9QT8X_JBsWKllDzuJ0VdPZ--Q/exec';
 let CU=null,CR='old',CFY='2024-25';
 let TR={old:0,ne:0,ti:0,gross:0,ded:0,hra:0,oR:null,nR:null};
 const fmt=v=>!v||isNaN(v)?'Rs.0':'Rs.'+Math.round(v).toLocaleString('en-IN');
@@ -669,16 +669,25 @@ async function register(){
 async function login(){
   const em=el('le').value.trim(),pw=el('lp').value;
   const ee=el('lerr');ee.style.display='none';
-  if(!em||!pw){ee.style.display='block';return;}
+  if(!em||!pw){ee.textContent='Please enter email and password.';ee.style.display='block';return;}
   if(em==='demo@taxmaga.in'&&pw==='demo1234'){loginOK({FirstName:'Demo',LastName:'User',Email:em,PAN:'DEMO01234A',Mobile:'9999999999',DOB:'1990-01-01',AY:'AY 2025-26',Status:'approved'});return;}
-  sL('Verifying credentials');const users=await rdSh(0);hL();
-  if(!users){ee.textContent='Cannot reach Google Sheet. Use demo@taxmaga.in / demo1234 for demo.';ee.style.display='block';return;}
-  const u=users.find(x=>x.Email?.toLowerCase()===em.toLowerCase()&&x.Password===pw);
-  if(!u){ee.textContent='Invalid email or password.';ee.style.display='block';return;}
-  const st=(u.Status||'').toLowerCase().trim();
-  if(st==='pending'){ee.textContent='Account pending admin approval. Please wait.';ee.style.display='block';return;}
-  if(st!=='approved'){ee.textContent='Account not approved. Status: '+st;ee.style.display='block';return;}
-  loginOK(u);
+  sL('Verifying credentials...');
+  // Use Apps Script to fetch user — avoids sheet sharing/gid issues entirely
+  const result=await new Promise((resolve)=>{
+    const cbName='_lcb_'+Date.now();
+    window[cbName]=(res)=>{delete window[cbName];if(sc)sc.remove();resolve(res);};
+    const params=encodeURIComponent(JSON.stringify({action:'login',email:em,password:pw}));
+    const url=ASU+'?data='+params+'&callback='+encodeURIComponent(cbName);
+    const sc=document.createElement('script');
+    sc.src=url;
+    sc.onerror=()=>{delete window[cbName];sc.remove();resolve(null);};
+    document.head.appendChild(sc);
+    setTimeout(()=>{if(window[cbName]){delete window[cbName];if(sc)sc.remove();resolve(null);}},8000);
+  });
+  hL();
+  if(!result){ee.textContent='Could not reach Google Sheets. Check internet connection.';ee.style.display='block';return;}
+  if(!result.success){ee.textContent=result.error||'Login failed.';ee.style.display='block';return;}
+  loginOK(result.user);
 }
 function loginOK(u){
   CU=u;sessionStorage.setItem('tm_u',JSON.stringify(u));
