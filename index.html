@@ -998,20 +998,28 @@ function gCall(params,url){
   });
 }
 
-// ── ANTHROPIC API CALL ────────────────────────────────────────────────────
-async function callClaude(messages,system){
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1000,
-      system:system||'You are Aryan, a friendly and expert Indian Chartered Accountant (CA) specializing in income tax planning. You speak in simple, conversational English — no unnecessary jargon. When you mention amounts, always use ₹ symbol and Indian numbering (lakhs, crores). Keep responses concise and actionable. Current FY is 2024-25 (AY 2025-26). Budget 2025 is in effect — New Regime now default, ₹12L effectively tax-free under New Regime.',
-      messages:messages
-    })
-  });
-  const data=await resp.json();
-  return data.content?.[0]?.text||'Sorry, I could not process that. Please try again.';
+// ── PUTER API CALL ────────────────────────────────────────────────────
+async function callClaude(messages, system){
+  try{
+    const resp = await fetch('https://js.puter.com/v2/ai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: messages,
+        system: system || `You are Aryan, a friendly and expert Indian Chartered Accountant (CA) specializing in income tax planning. You speak in simple, conversational English — no unnecessary jargon. When you mention amounts, always use ₹ symbol and Indian numbering (lakhs, crores). Keep responses concise and actionable. Current FY is 2024-25 (AY 2025-26). Budget 2025 is in effect — New Regime now default, ₹12L effectively tax-free under New Regime.`
+      })
+    });
+
+    const data = await resp.json();
+
+    return data?.message || "Sorry, I could not process that. Please try again.";
+
+  } catch (e){
+    console.error("PUTER ERROR:", e);
+    return "Connection issue. Please try again.";
+  }
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
