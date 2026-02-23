@@ -1059,7 +1059,7 @@ function loginOK(u){
   showPage('page-app');showP('dashboard');
   toast('Welcome back, '+u.FirstName+'! 🙏','s');
   // Greet in chat
-  setTimeout(()=>{addChatMsg('ai','Namaste '+u.FirstName+'! 🙏 I\'m Aryan, your personal AI Tax CA. Would you like to start with the <strong>Smart Setup Wizard</strong> for a guided experience, or just ask me anything directly?');},500);
+  setTimeout(()=>{addChatMsg('ai','Let\'s get started '+u.FirstName+'! ');},500);
 }
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));el(id).classList.add('active');}
 const PT={dashboard:'Dashboard',ai:'AI Tax CA — Aryan',wizard:'Smart Setup Wizard',import:'Import Salary Slip',calculator:'Tax Calculator',deductions:'Deductions & Savings',investments:'Investment Planner',regimecompare:'Regime Comparison',itrguide:'ITR Form Guide',history:'Tax History',profile:'My Profile'};
