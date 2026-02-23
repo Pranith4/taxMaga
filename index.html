@@ -1001,7 +1001,7 @@ function gCall(params,url){
 // ── PUTER API CALL ────────────────────────────────────────────────────
 async function callClaude(messages, system){
   try{
-    const resp = await fetch('https://js.puter.com/v2/ai/chat', {
+    const resp = await fetch('https://api.puter.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
